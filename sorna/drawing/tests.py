@@ -13,24 +13,26 @@ class CanvasFunctionalTest(unittest.TestCase):
         self.assertIsInstance(t, Turtle)
 
     def test_update(self):
-        builtins._sorna_has_drawing = False
+        builtins._sorna_media = []
         c = Canvas(100, 120)
         l = c.line(20, 20, 50, 50)
         b = c.circle(10, 10, 30)
         c.update()
-        self.assertTrue(builtins._sorna_has_drawing)
-        data = builtins._sorna_drawing_data
+        self.assertGreater(len(builtins._sorna_media), 0)
+        self.assertEqual(builtins._sorna_media[0][0], 'application/x-sorna-drawing')
+        data = builtins._sorna_media[0][1]
         update = json.loads(data)
         self.assertEqual('canvas', update[0][0])
         self.assertEqual(100, update[0][1])
         self.assertEqual(120, update[0][2])
         circle_id = update[-1][1]
 
-        builtins._sorna_has_drawing = False
+        builtins._sorna_media = []
         b.set_y(45)
         c.update()
-        self.assertTrue(builtins._sorna_has_drawing)
-        data = builtins._sorna_drawing_data
+        self.assertGreater(len(builtins._sorna_media), 0)
+        self.assertEqual(builtins._sorna_media[0][0], 'application/x-sorna-drawing')
+        data = builtins._sorna_media[0][1]
         update = json.loads(data)
         self.assertEqual('update', update[0][0])
         self.assertEqual(circle_id, update[0][1])

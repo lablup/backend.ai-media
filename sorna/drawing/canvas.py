@@ -41,8 +41,9 @@ class Canvas:
         self.fgcolor = fgcolor
 
     def update(self):
-        builtins._sorna_has_drawing = True
-        builtins._sorna_drawing_data = json.dumps(self._cmd_history)
+        builtins._sorna_media.append(
+            ('application/x-sorna-drawing', json.dumps(self._cmd_history))
+        )
         self._cmd_history = []
 
     def create_turtle(self):
