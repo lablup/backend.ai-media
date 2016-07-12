@@ -23,7 +23,7 @@ setup(
     packages=['sorna.drawing'],
     namespace_packages=['sorna'],
 
-    install_requires=['namedlist', 'simplejson'],
+    install_requires=['namedlist', 'u-msgpack-python'],
     extras_require={
         'dev': [],
         'test': [],

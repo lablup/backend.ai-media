@@ -1,11 +1,10 @@
-import uuid
-import simplejson as json
 import builtins
+from .encoding import encode_commands, decode_commands
 from .turtle import Turtle
 from .color import Colors
 
-def new(*args, **kwargs):
-    return Canvas(*args, **kwargs)
+
+_canvas_id_counter = 0
 
 
 class DrawingObject:
@@ -18,22 +17,24 @@ class DrawingObject:
     def set_x(self, x):
         assert self._args[0] in ('rect', 'circle')
         self._args[1] = x
-        self._canvas._cmd_history.append(('update', self._id, 1, x))
+        self._canvas._cmd_history.append((self._cavnas._id, 'update', self._id, 1, x))
 
     def set_y(self, y):
         assert self._args[0] in ('rect', 'circle')
         self._args[2] = y
-        self._canvas._cmd_history.append(('update', self._id, 2, y))
+        self._canvas._cmd_history.append((self._canvas._id, 'update', self._id, 2, y))
 
 
 
 class Canvas:
 
     def __init__(self, width, height, bgcolor=Colors.White, fgcolor=Colors.Black):
-        self._id = str(uuid.uuid4())
+        global _canvas_id_counter
+        self._id = _canvas_id_counter
+        _canvas_id_counter += 1
         self._cmd_history = []
         self._next_objid = 0
-        self._cmd_history.append(('canvas',
+        self._cmd_history.append((self._id, 'canvas',
                                  width, height,
                                  bgcolor.to_hex(),
                                  fgcolor.to_hex()))
@@ -41,9 +42,10 @@ class Canvas:
         self.fgcolor = fgcolor
 
     def update(self):
-        builtins._sorna_media.append(
-            ('application/x-sorna-drawing', json.dumps(self._cmd_history))
-        )
+        builtins._sorna_media.append((
+            'application/x-sorna-drawing',
+            encode_commands(self._cmd_history)
+        ))
         self._cmd_history = []
 
     def create_turtle(self):
@@ -55,42 +57,52 @@ class Canvas:
         pass
 
     def stop_animation(self):
-        self._cmd_history.append(('stop-anim',))
+        self._cmd_history.append((self._id, 'stop-anim',))
 
     def resume_animation(self):
-        self._cmd_history.append(('resume-anim',))
+        self._cmd_history.append((self._id, 'resume-anim',))
 
     def begin_fill(self, c):
-        self._cmd_history.append(('begin-fill', c.to_hex()))
+        self._cmd_history.append((self._id, 'begin-fill', c.to_hex()))
 
     def end_fill(self):
-        self._cmd_history.append(('end-fill',))
+        self._cmd_history.append((self._id, 'end-fill',))
 
     def background_color(self, c):
         self.bgcolor = c
-        self._cmd_history.append(('bgcolor', c.to_hex()))
+        self._cmd_history.append((self._id, 'bgcolor', c.to_hex()))
 
     def stroke_color(self, c):
         self.fgcolor = c
-        self._cmd_history.append(('fgcolor', c.to_hex()))
+        self._cmd_history.append((self._id, 'fgcolor', c.to_hex()))
 
-    def line(self, x0, y0, x1, y1):
-        args = ('line', x0, y0, x1, y1)
-        self._cmd_history.append(('obj', self._next_objid, args))
+    def line(self, x0, y0, x1, y1, border=None):
+        if border is None:
+            border = self.fgcolor
+        args = ('line', x0, y0, x1, y1, border.to_hex())
+        self._cmd_history.append((self._id, 'obj', self._next_objid, args))
         obj = DrawingObject(self, self._next_objid, args)
         self._next_objid += 1
         return obj
 
-    def circle(self, x, y, r):
-        args = ('circle', x, y, r)
-        self._cmd_history.append(('obj', self._next_objid, args))
+    def circle(self, x, y, radius, border=None, fill=None):
+        if border is None:
+            border = self.fgcolor
+        if fill is None:
+            fill = Colors.Transparent
+        args = ('circle', x, y, radius, border.to_hex(), fill.to_hex())
+        self._cmd_history.append((self._id, 'obj', self._next_objid, args))
         obj = DrawingObject(self, self._next_objid, args)
         self._next_objid += 1
         return obj
 
-    def rectangle(self, x0, y0, x1, y1):
-        args = ('rect', x0, y0, x1, y1)
-        self._cmd_history.append(('obj', self._next_objid, args))
+    def rectangle(self, left, top, width, height, border=None, fill=None):
+        if border is None:
+            border = self.fgcolor
+        if fill is None:
+            fill = Colors.Transparent
+        args = ('rect', left, top, width, height, border.to_hex(), fill.to_hex())
+        self._cmd_history.append((self._id, 'obj', self._next_objid, args))
         obj = DrawingObject(self, self._next_objid, args)
         self._next_objid += 1
         return obj
@@ -98,6 +110,5 @@ class Canvas:
 
 
 __all__ = [
-    'new',
     'Canvas',
 ]
