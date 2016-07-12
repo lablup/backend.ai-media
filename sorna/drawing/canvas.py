@@ -15,15 +15,60 @@ class DrawingObject:
         self._args = list(args)
 
     def set_x(self, x):
-        assert self._args[0] in ('rect', 'circle')
-        self._args[1] = x
-        self._canvas._cmd_history.append((self._cavnas._id, 'update', self._id, 1, x))
+        if self._args[0] in ('rect', 'circle'):
+            self._args[1] = x
+            self._canvas._cmd_history.append((self._cavnas._id, 'update', self._id, 'x', x))
 
     def set_y(self, y):
-        assert self._args[0] in ('rect', 'circle')
-        self._args[2] = y
-        self._canvas._cmd_history.append((self._canvas._id, 'update', self._id, 2, y))
+        if self._args[0] in ('rect', 'circle'):
+            self._args[2] = y
+            self._canvas._cmd_history.append((self._canvas._id, 'update', self._id, 'y', y))
 
+    def set_x1(self, x):
+        if self._args[0] == 'line':
+            self._args[1] = x
+            self._canvas._cmd_history.append((self._cavnas._id, 'update', self._id, 'x1', x))
+
+    def set_y1(self, y):
+        if self._args[0] == 'line':
+            self._args[2] = y
+            self._canvas._cmd_history.append((self._canvas._id, 'update', self._id, 'y1', y))
+
+    def set_x2(self, x):
+        if self._args[0] == 'line':
+            self._args[3] = x
+            self._canvas._cmd_history.append((self._canvas._id, 'update', self._id, 'x2', x))
+
+    def set_y2(self, y):
+        if self._args[0] == 'line':
+            self._args[4] = y
+            self._canvas._cmd_history.append((self._canvas._id, 'update', self._id, 'y2', y))
+
+    def set_radius(self, r):
+        if self._args[0] == 'circle':
+            self._args[3] = r
+            self._canvas._cmd_history.append((self._canvas._id, 'update', self._id, 'radius', r))
+
+    def stroke(self, color):
+        color = color.to_hex()
+        if self._args[0] == 'line':
+            self._args[5] = color
+            self._canvas._cmd_history.append((self._canvas._id, 'update', self._id, 'color', color))
+        elif self._args[0] == 'circle':
+            self._args[4] = color
+            self._canvas._cmd_history.append((self._canvas._id, 'update', self._id, 'border', color))
+        elif self._args[0] == 'rect':
+            self._args[5] = color
+            self._canvas._cmd_history.append((self._canvas._id, 'update', self._id, 'border', color))
+
+    def fill(self, color):
+        color = color.to_hex()
+        if self._args[0] == 'circle':
+            self._args[5] = color
+            self._canvas._cmd_history.append((self._canvas._id, 'update', self._id, 'fill', color))
+        elif self._args[0] == 'rect':
+            self._args[6] = color
+            self._canvas._cmd_history.append((self._canvas._id, 'update', self._id, 'fill', color))
 
 
 class Canvas:
@@ -76,32 +121,32 @@ class Canvas:
         self.fgcolor = c
         self._cmd_history.append((self._id, 'fgcolor', c.to_hex()))
 
-    def line(self, x0, y0, x1, y1, border=None):
-        if border is None:
-            border = self.fgcolor
-        args = ('line', x0, y0, x1, y1, border.to_hex())
+    def line(self, x0, y0, x1, y1, color=None):
+        if color is None:
+            color = self.fgcolor
+        args = ('line', x0, y0, x1, y1, color.to_hex())
         self._cmd_history.append((self._id, 'obj', self._next_objid, args))
         obj = DrawingObject(self, self._next_objid, args)
         self._next_objid += 1
         return obj
 
-    def circle(self, x, y, radius, border=None, fill=None):
+    def circle(self, x, y, radius, border=None, fill=None, angle=0):
         if border is None:
             border = self.fgcolor
         if fill is None:
             fill = Colors.Transparent
-        args = ('circle', x, y, radius, border.to_hex(), fill.to_hex())
+        args = ('circle', x, y, radius, border.to_hex(), fill.to_hex(), angle)
         self._cmd_history.append((self._id, 'obj', self._next_objid, args))
         obj = DrawingObject(self, self._next_objid, args)
         self._next_objid += 1
         return obj
 
-    def rectangle(self, left, top, width, height, border=None, fill=None):
+    def rectangle(self, left, top, width, height, border=None, fill=None, angle=0):
         if border is None:
             border = self.fgcolor
         if fill is None:
             fill = Colors.Transparent
-        args = ('rect', left, top, width, height, border.to_hex(), fill.to_hex())
+        args = ('rect', left, top, width, height, border.to_hex(), fill.to_hex(), angle)
         self._cmd_history.append((self._id, 'obj', self._next_objid, args))
         obj = DrawingObject(self, self._next_objid, args)
         self._next_objid += 1

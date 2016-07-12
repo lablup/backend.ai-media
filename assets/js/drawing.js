@@ -12,6 +12,7 @@ window.Sorna.Drawing = {
     },
 
     _canvas_instances: {},
+    _obj_map: {},
 
     get_canvas: function(canvas_id, container) {
         var _id = 'sorna-canvas-' + canvas_id;
@@ -29,6 +30,16 @@ window.Sorna.Drawing = {
         return canvas_obj;
     },
 
+    get_object: function(canvas_id, obj_id) {
+        var key = canvas_id + ':' + obj_id;
+        return this._obj_map[key] || null;
+    },
+
+    register_object: function(canvas_id, obj_id, obj) {
+        var key = canvas_id + ':' + obj_id;
+        this._obj_map[key] = obj;
+    },
+
     hex2rgba: function(val) {
         val = val.replace('#', '');
         var r = parseInt(val.substring(0, 2), 16),
@@ -39,12 +50,11 @@ window.Sorna.Drawing = {
     },
 
     update: function(result_id, type, data, container) {
-        // TODO: This is a demo!
         var cmds = this.decode_commands(data);
         for (var i = 0; i < cmds.length; i++) {
             var cmd = cmds[i];
-            var canvas = this.get_canvas(cmd[0], container);
-            var obj = null;
+            var canvas_id = cmd[0];
+            var canvas = this.get_canvas(canvas_id, container);
             switch (cmd[1]) {
             case 'canvas':
                 canvas.setWidth(cmd[2]);
@@ -55,33 +65,96 @@ window.Sorna.Drawing = {
             case 'obj':
                 var obj_id = cmd[2];
                 var args = cmd[3];
-                switch (args[0]) {
-                case 'line':
-                    obj = new fabric.Circle();
-                    canvas.add(obj);
-                case 'circle':
-                    obj = new fabric.Circle({
-                        left: args[1] - args[3],
-                        top: args[2] - args[3],
-                        radius: args[3],
-                        fill: this.hex2rgba(args[5]),
-                        stroke: this.hex2rgba(args[4]),
-                        strokeWidth: 2
-                    });
-                    canvas.add(obj);
-                case 'rect':
-                    obj = new fabric.Circle({
-                        left: args[1],
-                        top: args[2],
-                        width: args[3],
-                        height: args[4],
-                        fill: this.hex2rgba(args[6]),
-                        stroke: this.hex2rgba(args[5]),
-                        strokeWidth: 2
-                    });
-                    canvas.add(obj);
+                var obj = this.get_object(canvas_id, obj_id);
+                if (obj == null) {
+                    // create
+                    switch (args[0]) {
+                    case 'line':
+                        obj = new fabric.Line([
+                            args[1], args[2],
+                            args[3], args[4]
+                        ], {
+                            stroke: this.hex2rgba(args[5]),
+                            selectable: false
+                        });
+                        break;
+                    case 'circle':
+                        obj = new fabric.Circle({
+                            left: args[1] - args[3],
+                            top: args[2] - args[3],
+                            radius: args[3],
+                            stroke: this.hex2rgba(args[4]),
+                            fill: this.hex2rgba(args[5]),
+                            angle: args[6],
+                            strokeWidth: 2,
+                            selectable: false
+                        });
+                        break;
+                    case 'rect':
+                        obj = new fabric.Circle({
+                            left: args[1],
+                            top: args[2],
+                            width: args[3],
+                            height: args[4],
+                            stroke: this.hex2rgba(args[5]),
+                            fill: this.hex2rgba(args[6]),
+                            angle: args[7],
+                            strokeWidth: 2,
+                            selectable: false
+                        });
+                        break;
+                    default:
+                        obj = null;
+                    }
+                    if (obj) {
+                        obj._sorna_id = obj_id;
+                        this.register_object(canvas_id, obj_id, obj);
+                        canvas.add(obj);
+                    }
                 }
                 break;
+            case 'update':
+                var obj_id = cmd[2];
+                var obj = this.get_object(canvas_id, obj_id);
+                if (obj == null)
+                    continue;
+                var prop = cmd[3];
+                var val = cmd[4];
+                console.log('update', [canvas_id, obj_id], prop, val);
+                switch (prop) {
+                case 'x':
+                    if (obj.type == 'circle') val -= obj.radius;
+                    obj.setLeft(val);
+                    break;
+                case 'y':
+                    if (obj.type == 'circle') val -= obj.radius;
+                    obj.setTop(val);
+                    break;
+                case 'x1':
+                    obj.set('x1', val);
+                    break;
+                case 'y1':
+                    obj.set('y1', val);
+                    break;
+                case 'x2':
+                    obj.set('x2', val);
+                    break;
+                case 'y2':
+                    obj.set('y2', val);
+                    break;
+                case 'radius':
+                    obj.setRadius(val);
+                    break;
+                case 'color':
+                    obj.setColor(this.hex2rgba(val));
+                    break;
+                case 'border':
+                    obj.setStroke(this.hex2rgba(val));
+                    break;
+                case 'fill':
+                    obj.setFill(this.hex2rgba(val));
+                    break;
+                }
             }
             canvas.renderAll();
         }

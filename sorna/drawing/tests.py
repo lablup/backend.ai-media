@@ -49,7 +49,7 @@ class CanvasFunctionalTest(unittest.TestCase):
         self.assertEqual(0, update[0][0])
         self.assertEqual('update', update[0][1])
         self.assertEqual(circle_id, update[0][2])
-        self.assertEqual(2, update[0][3])
+        self.assertEqual('y', update[0][3])
         self.assertEqual(45, update[0][4])
 
 
