@@ -38,6 +38,9 @@ class Color:
     def to_bytes(self):
         return rgba.pack(self.red, self.green, self.blue, self.alpha)
 
+    def to_rgba(self):
+        return 'rgba({},{},{})'.format(self.red, self.green, self.blue, self.alpha)
+
 
 class Colors(Color, enum.Enum):
     Transparent = (0, 0, 0, 0)
