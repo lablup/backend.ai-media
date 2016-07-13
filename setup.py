@@ -3,6 +3,20 @@ from setuptools import setup
 # To use a consistent encoding
 from codecs import open
 from os import path
+import sys
+
+universal_requires = [
+    'six',
+    'simplejson',
+    'namedlist',
+    'u-msgpack-python',
+    'matplotlib==1.5.1',
+]
+
+if sys.version_info < (3, 4, 0):
+    py2_requires = ['enum34']
+else:
+    py2_requires = []
 
 setup(
     name='sorna-media',
@@ -21,7 +35,7 @@ setup(
     packages=['sorna'],
     namespace_packages=['sorna'],
 
-    install_requires=['six', 'simplejson', 'namedlist', 'u-msgpack-python', 'matplotlib'],
+    install_requires=universal_requires + py2_requires,
     extras_require={
         'dev': [],
         'test': ['nose'],

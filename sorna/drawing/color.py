@@ -7,7 +7,6 @@ rgba = struct.Struct('BBBB')
 class Color:
 
     def __init__(self, red, green, blue, alpha=255):
-        super().__init__()
         self.red = red
         self.green = green
         self.blue = blue

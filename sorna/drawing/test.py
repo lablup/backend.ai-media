@@ -1,4 +1,4 @@
-import builtins
+from six.moves import builtins
 import simplejson as json
 import unittest
 

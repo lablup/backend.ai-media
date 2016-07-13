@@ -16,7 +16,7 @@ from matplotlib.backends import backend_agg
 
 # My own imports
 import base64
-import builtins
+from six.moves import builtins
 import io
 
 
@@ -42,7 +42,7 @@ class FigureCanvasSorna(backend_agg.FigureCanvasAgg):
     supports_blit = False
 
     def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
+        super(FigureCanvasSorna, self).__init__(*args, **kwargs)
         self._is_old = True
         self._dpi_ratio = 1
 
@@ -62,7 +62,7 @@ class FigureCanvasSorna(backend_agg.FigureCanvasAgg):
 class FigureManagerSorna(FigureManagerBase):
 
     def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
+        super(FigureManagerSorna, self).__init__(*args, **kwargs)
     
     def show(self):
         with io.BytesIO() as buf:
