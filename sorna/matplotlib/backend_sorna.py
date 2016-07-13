@@ -2,6 +2,8 @@
 Displays Agg images in the browser, wrapping them as Sorna media responses.
 '''
 
+import six
+
 # Base imports from matplotlib.backends.backend_template
 import matplotlib
 from matplotlib._pylab_helpers import Gcf
