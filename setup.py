@@ -20,7 +20,7 @@ setup(
     author_email='joongi@lablup.com',
     license='Private',
 
-    packages=['sorna.drawing'],
+    packages=['sorna.drawing', 'sorna.matplotlib'],
     namespace_packages=['sorna'],
 
     install_requires=['namedlist', 'u-msgpack-python'],
