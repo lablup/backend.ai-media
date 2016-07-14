@@ -3,6 +3,7 @@ import unittest
 import matplotlib
 matplotlib.use('module://sorna.matplotlib.backend_sorna')
 import matplotlib.pyplot as plt
+from .backend_sorna import _backend
 
 class BackendReplacementTest(unittest.TestCase):
 
@@ -14,4 +15,7 @@ class BackendReplacementTest(unittest.TestCase):
         plt.ylabel('some numbers')
         plt.show()
         self.assertGreater(len(builtins._sorna_media), 0)
-        self.assertEqual(builtins._sorna_media[0][0], 'image/png')
+        if _backend == 'png':
+            self.assertEqual(builtins._sorna_media[0][0], 'image/png')
+        elif _backend == 'svg':
+            self.assertEqual(builtins._sorna_media[0][0], 'image/svg+xml')

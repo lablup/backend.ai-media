@@ -12,7 +12,9 @@ from matplotlib.figure import Figure
 from matplotlib.transforms import Bbox
 
 # The real renderer that generates image data
+_backend = 'svg'
 from matplotlib.backends import backend_agg
+from matplotlib.backends import backend_svg
 
 # My own imports
 import base64
@@ -33,16 +35,16 @@ def new_figure_manager(num, *args, **kwargs):
     return new_figure_manager_given_figure(num, thisFig)
 
 def new_figure_manager_given_figure(num, figure):
-    canvas = FigureCanvasSorna(figure)
-    manager = FigureManagerSorna(canvas, num)
+    canvas = FigureCanvas(figure)
+    manager = FigureManager(canvas, num)
     return manager
 
 
-class FigureCanvasSorna(backend_agg.FigureCanvasAgg):
+class FigureCanvasSornaAgg(backend_agg.FigureCanvasAgg):
     supports_blit = False
 
     def __init__(self, *args, **kwargs):
-        super(FigureCanvasSorna, self).__init__(*args, **kwargs)
+        super(FigureCanvasSornaAgg, self).__init__(*args, **kwargs)
         self._is_old = True
         self._dpi_ratio = 1
 
@@ -59,22 +61,44 @@ class FigureCanvasSorna(backend_agg.FigureCanvasAgg):
         return 'png'
 
 
+class FigureCanvasSornaSVG(backend_svg.FigureCanvasSVG):
+
+    def __init__(self, *args, **kwargs):
+        super(FigureCanvasSornaSVG, self).__init__(*args, **kwargs)
+
+
 class FigureManagerSorna(FigureManagerBase):
 
     def __init__(self, *args, **kwargs):
         super(FigureManagerSorna, self).__init__(*args, **kwargs)
     
     def show(self):
-        with io.BytesIO() as buf:
-            self.canvas.print_png(buf)
-            raw = buf.getvalue()
-        enc = base64.b64encode(raw)
-        builtins._sorna_media.append((
-            'image/png',
-            'data:image/png;base64,' + enc.decode('ascii')
-        ))
+        if _backend == 'agg':
+            with io.BytesIO() as buf:
+                self.canvas.print_png(buf)
+                raw = buf.getvalue()
+            enc = base64.b64encode(raw)
+            builtins._sorna_media.append((
+                'image/png',
+                'data:image/png;base64,' + enc.decode('ascii')
+            ))
+        elif _backend == 'svg':
+            with io.BytesIO() as buf:
+                self.canvas.print_svg(buf)
+                raw = buf.getvalue()
+            builtins._sorna_media.append((
+                'image/svg+xml',
+                raw.decode('ascii'),
+            ))
+        else:
+            raise RuntimeError('Unsupported sorna matplotlib backend.')
 
 
-FigureCanvas = FigureCanvasSorna
+if _backend == 'svg':
+    FigureCanvas = FigureCanvasSornaSVG
+elif _backend == 'agg':
+    FigureCanvas = FigureCanvasSornaAgg
+else:
+    raise ImportError('_backend has wrong value!')
 FigureManager = FigureManagerSorna
 
