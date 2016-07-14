@@ -32,7 +32,7 @@ setup(
     author_email='joongi@lablup.com',
     license='LGPL+BSD',
 
-    packages=['sorna'],
+    packages=['sorna.drawing', 'sorna.matplotlib'],
     namespace_packages=['sorna'],
 
     install_requires=universal_requires + py2_requires,
