@@ -88,7 +88,7 @@ class FigureManagerSorna(FigureManagerBase):
                 raw = buf.getvalue()
             builtins._sorna_media.append((
                 'image/svg+xml',
-                raw.decode('ascii'),
+                raw.decode('utf8'),
             ))
         else:
             raise RuntimeError('Unsupported sorna matplotlib backend.')
