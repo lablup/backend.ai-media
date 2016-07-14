@@ -1,6 +1,16 @@
 'use strict';
 
-window.Sorna = window.Sorna || {};
+__webpack_public_path__ = Sorna.assetRoot;
+__webpack_require__.p = Sorna.assetRoot + 'js/';
+
+window.Sorna = window.Sorna || { version: '0.2.0' };
+
+var fabric_loader = function(resolve) {
+  require.ensure(['fabric'], function() {
+    window.fabric = require('fabric').fabric;
+    resolve();
+  });
+};
 
 Sorna.Media = {
   _insert_media_script: function(id, url, onload) {
@@ -18,9 +28,8 @@ Sorna.Media = {
   _get_drawing_impl: function() {
     return {
       scripts: [
-        {id:'js.media-common-fabric', url:'//cdnjs.cloudflare.com/ajax/libs/fabric.js/1.6.3/fabric.min.js'},
-        {id:'js.sorna-msgpack', url:Sorna.assetRoot + 'js/msgpack.min.js'},
-        {id:'js.sorna-drawing', url:Sorna.assetRoot + 'js/drawing.js'}
+        {id:'js.common-fabric', loader:fabric_loader},
+        {id:'js.sorna-drawing', url:Sorna.assetRoot + 'js/drawing.min.js'}
       ],
       handler: function(result_id, type, data, container) {
         Sorna.Drawing.update(result_id, type, data, container);
@@ -29,7 +38,8 @@ Sorna.Media = {
   },
   _get_image_impl: function() {
     return {
-      scripts: [],
+      scripts: [
+      ],
       handler: function(result_id, type, data, container) {
         var img_elem = document.getElementById(result_id);
         if (!img_elem) {
@@ -46,7 +56,7 @@ Sorna.Media = {
   _get_svg_impl: function() {
     return {
       scripts: [
-        {id:'js.media-common-fabric', url:'//cdnjs.cloudflare.com/ajax/libs/fabric.js/1.6.3/fabric.min.js'},
+        {id:'js.common-fabric', loader:fabric_loader}
       ],
       handler: function(result_id, type, data, container) {
         var canvas_elem = document.getElementById(result_id);
@@ -91,13 +101,19 @@ Sorna.Media = {
       var impl = this._get_media_impls()[media[0]];
       if (impl == undefined)
         continue;
-      var insert = this._insert_media_script;
       var script_promises = [];
       for (var j = 0; j < impl.scripts.length; j++) {
-        script_promises.push(new Promise(function(resolve, reject) {
-          if (insert(impl.scripts[j].id, impl.scripts[j].url, resolve))
-            resolve();
-        }));
+        if (impl.scripts[j].url !== undefined) {
+          var insert = this._insert_media_script;
+          script_promises.push(new Promise(function(resolve, reject) {
+            if (insert(impl.scripts[j].id, impl.scripts[j].url, resolve))
+              resolve();
+          }));
+        } else {
+          script_promises.push(new Promise(function(resolve, reject) {
+            impl.scripts[j].loader(resolve);
+          }));
+        }
       }
       Promise.all(script_promises).then(function() {
         impl.handler(result_id + '-' + i, media[0], media[1], result_container);

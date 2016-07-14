@@ -1,5 +1,10 @@
 'use strict';
 
+__webpack_public_path__ = Sorna.assetRoot;
+__webpack_require__.p = Sorna.assetRoot + 'js/';
+
+var msgpack = require('msgpack-lite');
+
 window.Sorna = window.Sorna || {};
 
 window.Sorna.Drawing = {

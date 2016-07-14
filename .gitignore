@@ -62,3 +62,6 @@ target/
 
 # Vim swaps
 .*.swp
+
+# npm/webpack
+node_modules
