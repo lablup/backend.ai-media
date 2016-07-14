@@ -17,7 +17,7 @@ This contains a set of media support stubs for the Sorna code execution service.
 
 ### Setting up
 
-```
+```sh
 $ cd sorna-media
 # Use package.json to install dependencies:
 $ npm install
@@ -30,7 +30,7 @@ $ npm install -g webpack
 
 ### Testing with local neumann frontend instances
 
-```
+```sh
 $ cd sorna-media/assets
 $ python -m http.server 8002
 ```
@@ -38,7 +38,7 @@ Note that the port number is fixed for Lablup's internal development
 configuration.  You may change it if you have different frontends.
 
 After modifying script files, please run:
-```
+```sh
 $ cd sorna-media
 $ ./update.sh
 ```
@@ -55,8 +55,8 @@ We use the standard aws-cli tool.  You first need to configure your AWS access
 key and the secret key.
 
 Run the following to update all assets:
-```
-aws s3 cp assets s3://sorna-assets/ --recursive
+```sh
+$ aws s3 cp assets s3://sorna-assets/ --recursive
 ```
 
 Then you should update the production configuration using the latest hash
