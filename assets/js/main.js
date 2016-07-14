@@ -1,7 +1,9 @@
 'use strict';
 
+/* Sorna Media Handlers. */
+
 __webpack_public_path__ = Sorna.assetRoot;
-__webpack_require__.p = Sorna.assetRoot + 'js/';
+__webpack_require__.p = Sorna.assetRoot + '/js/';
 
 window.Sorna = window.Sorna || { version: '0.2.0' };
 
@@ -29,7 +31,7 @@ Sorna.Media = {
     return {
       scripts: [
         {id:'js.common-fabric', loader:fabric_loader},
-        {id:'js.sorna-drawing', url:Sorna.assetRoot + 'js/drawing.min.js'}
+        {id:'js.sorna-drawing', url:Sorna.assetRoot + '/js/drawing.min.js'}
       ],
       handler: function(result_id, type, data, container) {
         Sorna.Drawing.update(result_id, type, data, container);

@@ -6,7 +6,7 @@ module.exports = {
     main: "./assets/js/main.js"
   },
   output: {
-    path: "./assets/js",
+    path: "./assets/[hash]/js",
     filename: "[name].min.js",
   },
   devtool: '#source-map',

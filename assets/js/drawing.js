@@ -1,7 +1,9 @@
 'use strict';
 
+/* Sorna Simplified Drawing API for HTML5 Canvas. */
+
 __webpack_public_path__ = Sorna.assetRoot;
-__webpack_require__.p = Sorna.assetRoot + 'js/';
+__webpack_require__.p = Sorna.assetRoot + '/js/';
 
 var msgpack = require('msgpack-lite');
 
