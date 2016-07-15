@@ -25,12 +25,40 @@ $ npm install -g webpack webpack-dev-server
 ```
 
 Globally installed webpack and webpack-dev-server will automatically call
-the local versions at ./node_modules if they exist.
+the local versions at `./node_modules` if they exist.
 
-### Testing with local neumann frontend instances
+### Integration with a front-end
+
+You need to specify `Sorna.assetRoot` in Javascript to let our scripts know
+which location to fetch additoinal scripts from.
+The `main.min.js` is designed to be small for faster page loads and most
+functionality (e.g., drawing support) are loaded on demand.
+
+For production:
+```html
+<script>
+window.Sorna = window.Sorna || {};
+window.Sorna.assetRoot = '//<sorna-serving-host>/<hash>';
+</script>
+<script src="//<sorna-serving-host>/<hash>/js/main.min.js"></script>
+```
+
+For development:
+```html
+<script>
+window.Sorna = window.Sorna || {};
+window.Sorna.assetRoot = 'http://localhost:8002/latest';
+</script>
+<script src="http://localhost:8002/latest/js/main.min.js"></script>
+```
+
+### Developing with local neumann frontend instances
 
 We use webpack-dev-server to automatically recompile the sources on the memory
-whenever they changes (aka "watch-mode").
+whenever they change (aka "watch-mode").
+However, you need to manually refresh the page to get the latest bundles as we
+do not use "hot module refresh" (HMR) due to conflicts with script tags without
+src attributes (e.g., ZenDesk-injected scripts).
 
 ```sh
 $ webpack-dev-server --config webpack.dev.config.js
