@@ -2,14 +2,9 @@
 
 /* Sorna Simplified Drawing API for HTML5 Canvas. */
 
-__webpack_public_path__ = Sorna.assetRoot;
-__webpack_require__.p = Sorna.assetRoot + '/js/';
-
 var msgpack = require('msgpack-lite');
 
-window.Sorna = window.Sorna || {};
-
-window.Sorna.Drawing = {
+module.exports.Drawing = {
   decode_commands: function(data) {
     var raw = atob(data);
     var u8array = new Uint8Array(new ArrayBuffer(raw.length));
@@ -127,7 +122,6 @@ window.Sorna.Drawing = {
           continue;
         var prop = cmd[3];
         var val = cmd[4];
-        console.log('update', [canvas_id, obj_id], prop, val);
         switch (prop) {
         case 'x':
           if (obj.type == 'circle') val -= obj.radius;

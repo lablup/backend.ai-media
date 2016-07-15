@@ -2,10 +2,13 @@
 
 /** Sorna Media Handlers. */
 
+window.Sorna = window.Sorna || { version: '0.2.0' };
+if (typeof(Sorna.assetRoot) == 'undefined') {
+  // Fallback to the current host address
+  Sorna.assetRoot = window.location.protocol + '//' + window.location.host;
+}
 __webpack_public_path__ = Sorna.assetRoot;
 __webpack_require__.p = Sorna.assetRoot + '/js/';
-
-window.Sorna = window.Sorna || { version: '0.2.0' };
 
 var fabric_loader = function(resolve) {
   require.ensure(['fabric'], function() {
@@ -14,24 +17,19 @@ var fabric_loader = function(resolve) {
   });
 };
 
+var drawing_loader = function(resolve) {
+  require.ensure(['./drawing.js'], function() {
+    Sorna.Drawing = require('./drawing.js').Drawing;
+    resolve();
+  });
+};
+
 Sorna.Media = {
-  _insert_media_script: function(id, url, onload) {
-    if (document.getElementById(id))
-      return true;
-    var el, next_el = document.getElementsByTagName('script')[0];
-    el = document.createElement('script');
-    el.id = id;
-    el.onload = onload;
-    el.async = true;
-    el.src = url;
-    next_el.parentNode.insertBefore(el, next_el);
-    return false;
-  },
   _get_drawing_impl: function() {
     return {
       scripts: [
         {id:'js.common-fabric', loader:fabric_loader},
-        {id:'js.sorna-drawing', url:Sorna.assetRoot + '/js/drawing.min.js'}
+        {id:'js.sorna-drawing', loader:drawing_loader}
       ],
       handler: function(result_id, type, data, container) {
         Sorna.Drawing.update(result_id, type, data, container);
@@ -105,17 +103,9 @@ Sorna.Media = {
         continue;
       var script_promises = [];
       for (var j = 0; j < impl.scripts.length; j++) {
-        if (impl.scripts[j].url !== undefined) {
-          var insert = this._insert_media_script;
-          script_promises.push(new Promise(function(resolve, reject) {
-            if (insert(impl.scripts[j].id, impl.scripts[j].url, resolve))
-              resolve();
-          }));
-        } else {
-          script_promises.push(new Promise(function(resolve, reject) {
-            impl.scripts[j].loader(resolve);
-          }));
-        }
+        script_promises.push(new Promise(function(resolve, reject) {
+          impl.scripts[j].loader(resolve);
+        }));
       }
       Promise.all(script_promises).then(function() {
         impl.handler(result_id + '-' + i, media[0], media[1], result_container);

@@ -2,7 +2,6 @@ var webpack = require("webpack");
 
 module.exports = {
   entry: {
-    drawing: "./assets/js/drawing.js",
     main: "./assets/js/main.js"
   },
   output: {
