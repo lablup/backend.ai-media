@@ -51,9 +51,9 @@ Before uploading, we first need to compile the resources for production.
 $ ./update.sh
 ```
 
-This script will write the compiled resources into assets/<hash> directory,
+This script will write the compiled resources into `assets/<hash>` directory,
 where the hash value depends on the content of all resource files.
-It also deletes all other assets/<old-hash> directories automatically to avoid
+It also deletes all other `assets/<old-hash>` directories automatically to avoid
 duplicate transfers below.
 To debug the webpack build process, simply run `webpack` and see what it says.
 
