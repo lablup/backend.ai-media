@@ -42,8 +42,8 @@ development configuration.  You may change it if you have different frontends.
 
 ### Deploying for production service
 
-We use the standard aws-cli tool.  You first need to configure your AWS access
-key and the secret key.
+We use the standard aws-cli tool.  You should configure your AWS access key and
+the secret key to make it working.
 
 Before uploading, we first need to compile the resources for production.
 
@@ -62,6 +62,8 @@ Then, run the following to upload all assets:
 $ aws s3 cp assets s3://sorna-assets/ --recursive
 ```
 
-You should update the production configuration using the latest hash value.
+Afterwards, you must update the production configuration (e.g.,
+`SORNA_ASSET_ROOT` in Django/Flask settings) for your front-end using the
+latest hash value.
 (e.g., https://s3.ap-northeast-2.amazonaws.com/sorna-assets/1234567890abcdef1234 )
 
