@@ -7,9 +7,10 @@ module.exports = {
   },
   output: {
     path: "./assets/[hash]/js",
+    publicPath: "/[hash]/js/",
     filename: "[name].min.js",
   },
-  devtool: '#source-map',
+  devtool: '#cheap-module-source-map',
   plugins: [
     new webpack.optimize.UglifyJsPlugin(),
   ]

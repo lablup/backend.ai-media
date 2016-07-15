@@ -18,48 +18,50 @@ This contains a set of media support stubs for the Sorna code execution service.
 ### Setting up
 
 ```sh
-$ cd sorna-media
 # Use package.json to install dependencies:
 $ npm install
 # To get command-line access for webpack:
-# (NOTE: ensure that both local/global webpack has the same versions)
-$ npm install -g webpack
-# Alternatively, you may manually call node_modules/webpack/bin/webpack.js,
-# but it is recommended to have the global version for update.sh script (see below).
+$ npm install -g webpack webpack-dev-server
 ```
+
+Globally installed webpack and webpack-dev-server will automatically call
+the local versions at ./node_modules if they exist.
 
 ### Testing with local neumann frontend instances
 
-```sh
-$ cd sorna-media/assets
-$ python -m http.server 8002
-```
-Note that the port number is fixed for Lablup's internal development
-configuration.  You may change it if you have different frontends.
+We use webpack-dev-server to automatically recompile the sources on the memory
+whenever they changes (aka "watch-mode").
 
-After modifying script files, please run:
 ```sh
-$ cd sorna-media
-$ ./update.sh
+$ webpack-dev-server --config webpack.dev.config.js
+# Bundled scripts are served at http://127.0.0.1:8002/latest/js/...
 ```
 
-This script will update the symbolic link `assets/latest` using the latest hash
-values calculated by webpack so that your development configuration uses the
-latest bundled javascript files.
-
-To debug the webpack build process, just run `webpack` and see what it says.
+Note that the port number in the configuration is fixed for Lablup's internal
+development configuration.  You may change it if you have different frontends.
 
 ### Deploying for production service
 
 We use the standard aws-cli tool.  You first need to configure your AWS access
 key and the secret key.
 
-Run the following to update all assets:
+Before uploading, we first need to compile the resources for production.
+
+```sh
+$ ./update.sh
+```
+
+This script will write the compiled resources into assets/<hash> directory,
+where the hash value depends on the content of all resource files.
+It also deletes all other assets/<old-hash> directories automatically to avoid
+duplicate transfers below.
+To debug the webpack build process, simply run `webpack` and see what it says.
+
+Then, run the following to upload all assets:
 ```sh
 $ aws s3 cp assets s3://sorna-assets/ --recursive
 ```
 
-Then you should update the production configuration using the latest hash
-value.
+You should update the production configuration using the latest hash value.
 (e.g., https://s3.ap-northeast-2.amazonaws.com/sorna-assets/1234567890abcdef1234 )
 

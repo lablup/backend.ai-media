@@ -1,6 +1,6 @@
 'use strict';
 
-/* Sorna Media Handlers. */
+/** Sorna Media Handlers. */
 
 __webpack_public_path__ = Sorna.assetRoot;
 __webpack_require__.p = Sorna.assetRoot + '/js/';
