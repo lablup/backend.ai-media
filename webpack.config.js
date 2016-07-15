@@ -15,4 +15,4 @@ module.exports = {
   ]
 };
 
-// vim: sts=2 sw=4 et
+// vim: sts=2 sw=2 et
