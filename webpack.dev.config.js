@@ -9,6 +9,7 @@ module.exports = {
     publicPath: "/latest/js/",
     filename: "[name].min.js",
   },
+  devtool: '#eval-source-map',
   devServer: {
     port: 8002,
     // Turn off live-reloading to avoid conflicts with ZenDesk.
@@ -17,6 +18,9 @@ module.exports = {
     hot: false,
     inline: false
   },
+  plugins: [
+    new webpack.optimize.UglifyJsPlugin(),
+  ]
 };
 
-// vim: sts=2 sw=4 et
+// vim: sts=2 sw=2 et

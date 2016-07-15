@@ -9,7 +9,7 @@ module.exports = {
     publicPath: "/[hash]/js/",
     filename: "[name].min.js",
   },
-  devtool: '#cheap-module-source-map',
+  devtool: '#source-map',
   plugins: [
     new webpack.optimize.UglifyJsPlugin(),
   ]
