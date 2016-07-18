@@ -1,9 +1,7 @@
 var webpack = require("webpack");
 
 module.exports = {
-  entry: {
-    main: "./assets/js/main.js"
-  },
+  entry: ["./assets/js/main.js"],
   output: {
     path: "./assets/[hash]/js",
     publicPath: "/[hash]/js/",
@@ -11,7 +9,7 @@ module.exports = {
   },
   devtool: '#source-map',
   plugins: [
-    new webpack.optimize.UglifyJsPlugin(),
+    new webpack.optimize.UglifyJsPlugin({ compress: { warnings: false }}),
   ]
 };
 
