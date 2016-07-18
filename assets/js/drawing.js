@@ -152,7 +152,7 @@ module.exports.Drawing = {
           onComplete: resolve
         });
       }
-      if (args[0] == 'fill' || args[0] == 'color') {
+      if (args[0] == 'fill' || args[0] == 'color' || args[0] == 'stroke') {
         obj.animateColor.apply(obj, args);
       } else {
         obj.animate.apply(obj, args);
@@ -384,16 +384,16 @@ module.exports.Drawing = {
               this._create_anim(canvas, obj, 'color', this.hex2rgba(val))
             ]);
           } else {
-            obj.setColor(this.hex2rgba(val));
+            obj.set('color', this.hex2rgba(val));
           }
           break;
         case 'border':
           if (canvas._sorna_anim) {
             anim_chain.push([
-              this._create_anim(canvas, obj, 'stroke', this.hex2rgba(val))
+              this._create_anim(canvas, obj, 'stroke', this.hex2rgba(val)),
             ]);
           } else {
-            obj.setStroke(this.hex2rgba(val));
+            obj.set('stroke', this.hex2rgba(val));
           }
           break;
         case 'fill':
@@ -402,7 +402,7 @@ module.exports.Drawing = {
               this._create_anim(canvas, obj, 'fill', this.hex2rgba(val))
             ]);
           } else {
-            obj.setFill(this.hex2rgba(val));
+            obj.set('fill', this.hex2rgba(val));
           }
           break;
         }
