@@ -24,6 +24,28 @@ var drawing_loader = function(resolve) {
   });
 };
 
+Sorna.Utils = {
+  async_series: function(items, handler) {
+    var results = null;
+    var items_copy = items.slice();
+    return new Promise(function(resolve, reject) {
+      function next(result) {
+        if (!results)
+          results = [];
+        else
+          results.push(result);
+        if (items_copy.length > 0) {
+          var item = items_copy.shift();
+          handler(item).then(next).catch(reject);
+        } else {
+          resolve(results);
+        }
+      }
+      next();
+    });
+  }
+};
+
 Sorna.Media = {
   _get_drawing_impl: function() {
     return {

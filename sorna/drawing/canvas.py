@@ -49,6 +49,12 @@ class DrawingObject:
             self._args[3] = r
             self._canvas._cmd_history.append((self._canvas._id, 'update', self._id, 'radius', r))
 
+    def rotate(self, a):
+        self._canvas._cmd_history.append((self._canvas._id, 'update', self._id, 'rotate', a))
+
+    def set_angle(self, a):
+        self._canvas._cmd_history.append((self._canvas._id, 'update', self._id, 'angle', a))
+
     def stroke(self, color):
         color = color.to_hex()
         if self._args[0] == 'line':

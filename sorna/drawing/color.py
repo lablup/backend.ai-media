@@ -42,7 +42,7 @@ class Color:
 
 
 class Colors(Color, enum.Enum):
-    Transparent = (0, 0, 0, 0)
+    Transparent = (255, 255, 255, 0)
     Black = (0, 0, 0, 255)
     Gray = (128, 128, 128, 255)
     White = (255, 255, 255, 255)
