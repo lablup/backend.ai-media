@@ -1,8 +1,9 @@
 from six.moves import builtins
 import simplejson as json
 import unittest
+import math
 
-from . import canvas, Canvas, Turtle, Color, Colors
+from . import canvas, Canvas, Vec2D, Turtle, Color, Colors
 from .encoding import encode_commands, decode_commands
 
 
@@ -77,3 +78,12 @@ class EncodingFunctionalTest(unittest.TestCase):
         encdata = encode_commands(c._cmd_history)
         cmds = decode_commands(encdata)
         self.assertListEqual(cmds[0], list(c._cmd_history[0]))
+
+
+class TurtleFunctionalTest(unittest.TestCase):
+
+    def test_vec2d(self):
+        v = Vec2D(1, 0)
+        self.assertAlmostEqual(1, abs(v))
+        v = Vec2D(1, 1)
+        self.assertAlmostEqual(math.sqrt(2), abs(v))
