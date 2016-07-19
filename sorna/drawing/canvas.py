@@ -50,10 +50,10 @@ class DrawingObject:
             self._canvas._cmd_history.append((self._canvas._id, u'update', self._id, u'radius', r))
 
     def rotate(self, a):
-        self._canvas._cmd_history.append((self._canvas._id, 'update', self._id, u'rotate', a))
+        self._canvas._cmd_history.append((self._canvas._id, u'update', self._id, u'rotate', a))
 
     def set_angle(self, a):
-        self._canvas._cmd_history.append((self._canvas._id, 'update', self._id, u'angle', a))
+        self._canvas._cmd_history.append((self._canvas._id, u'update', self._id, u'angle', a))
 
     def stroke(self, color):
         color = color.to_hex()

@@ -134,10 +134,11 @@ module.exports.Drawing = {
   },
 
   _create_anim: function(/* variable args */) {
+    var _args = Array.prototype.slice.call(arguments);
     return function(resolve) {
-      var canvas = arguments[0];
-      var obj = arguments[1];
-      var args = Array.prototype.slice.call(arguments, 2);
+      var canvas = _args[0];
+      var obj = _args[1];
+      var args = _args.slice(2);
       var last = args[args.length - 1];
       if (typeof last == 'object') {
         last.ease = fabric.util.ease.easeInOutExpo;
@@ -146,7 +147,7 @@ module.exports.Drawing = {
         last.onComplete = resolve;
       } else {
         args.push({
-          ease: fabric.util.ease.easeInOutExpo,
+          ease: fabric.util.ease.easeOutQuint,
           duration: 350,
           onChange: function() { canvas.renderAll(); },
           onComplete: resolve
@@ -407,9 +408,9 @@ module.exports.Drawing = {
           break;
         }
       }
-      Sorna.Utils.async_series(anim_chain, function(item) {
+      Sorna.Utils.async_series(anim_chain, function(anim_group) {
         var subanims = [];
-        item.forEach(function(subanim) {
+        anim_group.forEach(function(subanim) {
           subanims.push(new Promise(subanim));
         });
         return new Promise(function(resolve) {
