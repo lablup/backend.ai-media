@@ -17,7 +17,7 @@ class DrawingObject:
     def set_x(self, x):
         if self._args[0] in ('rect', 'circle'):
             self._args[1] = x
-            self._canvas._cmd_history.append((self._cavnas._id, 'update', self._id, 'x', x))
+            self._canvas._cmd_history.append((self._canvas._id, 'update', self._id, 'x', x))
 
     def set_y(self, y):
         if self._args[0] in (u'rect', u'circle'):
@@ -27,7 +27,7 @@ class DrawingObject:
     def set_x1(self, x):
         if self._args[0] == u'line':
             self._args[1] = x
-            self._canvas._cmd_history.append((self._cavnas._id, 'update', self._id, 'x1', x))
+            self._canvas._cmd_history.append((self._canvas._id, 'update', self._id, 'x1', x))
 
     def set_y1(self, y):
         if self._args[0] == u'line':
