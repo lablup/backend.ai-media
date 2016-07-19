@@ -17,17 +17,17 @@ class DrawingObject:
     def set_x(self, x):
         if self._args[0] in ('rect', 'circle'):
             self._args[1] = x
-            self._canvas._cmd_history.append((self._canvas._id, 'update', self._id, 'x', x))
+            self._canvas._cmd_history.append((self._canvas._id, u'update', self._id, u'x', x))
 
     def set_y(self, y):
         if self._args[0] in (u'rect', u'circle'):
             self._args[2] = y
-            self._canvas._cmd_history.append((self._canvas._id, 'update', self._id, 'y', y))
+            self._canvas._cmd_history.append((self._canvas._id, u'update', self._id, u'y', y))
 
     def set_x1(self, x):
         if self._args[0] == u'line':
             self._args[1] = x
-            self._canvas._cmd_history.append((self._canvas._id, 'update', self._id, 'x1', x))
+            self._canvas._cmd_history.append((self._canvas._id, u'update', self._id, u'x1', x))
 
     def set_y1(self, y):
         if self._args[0] == u'line':
