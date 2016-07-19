@@ -12,41 +12,34 @@ class DrawingObject:
     def __init__(self, canvas, id_, args):
         self._canvas = canvas
         self._id = id_
-        self._args = list(args)
+        self._type = args[0]
 
     def set_x(self, x):
-        if self._args[0] in ('rect', 'circle'):
-            self._args[1] = x
+        if self._type in (u'rect', u'circle', u'triangle'):
             self._canvas._cmd_history.append((self._canvas._id, u'update', self._id, u'x', x))
 
     def set_y(self, y):
-        if self._args[0] in (u'rect', u'circle'):
-            self._args[2] = y
+        if self._type in (u'rect', u'circle', u'triangle'):
             self._canvas._cmd_history.append((self._canvas._id, u'update', self._id, u'y', y))
 
     def set_x1(self, x):
-        if self._args[0] == u'line':
-            self._args[1] = x
+        if self._type == u'line':
             self._canvas._cmd_history.append((self._canvas._id, u'update', self._id, u'x1', x))
 
     def set_y1(self, y):
-        if self._args[0] == u'line':
-            self._args[2] = y
+        if self._type == u'line':
             self._canvas._cmd_history.append((self._canvas._id, u'update', self._id, u'y1', y))
 
     def set_x2(self, x):
-        if self._args[0] == u'line':
-            self._args[3] = x
+        if self._type == u'line':
             self._canvas._cmd_history.append((self._canvas._id, u'update', self._id, u'x2', x))
 
     def set_y2(self, y):
-        if self._args[0] == u'line':
-            self._args[4] = y
+        if self._type == u'line':
             self._canvas._cmd_history.append((self._canvas._id, u'update', self._id, u'y2', y))
 
     def set_radius(self, r):
-        if self._args[0] == u'circle':
-            self._args[3] = r
+        if self._type == u'circle':
             self._canvas._cmd_history.append((self._canvas._id, u'update', self._id, u'radius', r))
 
     def rotate(self, a):
@@ -57,23 +50,18 @@ class DrawingObject:
 
     def stroke(self, color):
         color = color.to_hex()
-        if self._args[0] == u'line':
-            self._args[5] = color
+        if self._type == u'line':
             self._canvas._cmd_history.append((self._canvas._id, u'update', self._id, u'color', color))
-        elif self._args[0] == u'circle':
-            self._args[4] = color
+        elif self._type == u'circle':
             self._canvas._cmd_history.append((self._canvas._id, u'update', self._id, u'border', color))
-        elif self._args[0] == u'rect':
-            self._args[5] = color
+        elif self._type in (u'rect', u'triangle'):
             self._canvas._cmd_history.append((self._canvas._id, u'update', self._id, u'border', color))
 
     def fill(self, color):
         color = color.to_hex()
-        if self._args[0] == u'circle':
-            self._args[5] = color
+        if self._type == u'circle':
             self._canvas._cmd_history.append((self._canvas._id, u'update', self._id, u'fill', color))
-        elif self._args[0] == u'rect':
-            self._args[6] = color
+        elif self._type in (u'rect', u'triangle'):
             self._canvas._cmd_history.append((self._canvas._id, u'update', self._id, u'fill', color))
 
 
@@ -89,6 +77,8 @@ class Canvas:
                                  width, height,
                                  bgcolor.to_hex(),
                                  fgcolor.to_hex()))
+        self.width = width
+        self.height = height
         self.bgcolor = bgcolor
         self.fgcolor = fgcolor
 
@@ -99,19 +89,24 @@ class Canvas:
         ))
         self._cmd_history = []
 
+    def show(self):  # alias
+        self.update()
+
     def create_turtle(self):
         t = Turtle(self)
         return t
-
-    @property
-    def size(self):
-        pass
 
     def stop_animation(self):
         self._cmd_history.append((self._id, u'stop-anim',))
 
     def resume_animation(self):
         self._cmd_history.append((self._id, u'resume-anim',))
+
+    def begin_group(self):
+        self._cmd_history.append((self._id, u'begin-group',))
+
+    def end_group(self):
+        self._cmd_history.append((self._id, u'end-group',))
 
     def begin_fill(self, c):
         self._cmd_history.append((self._id, u'begin-fill', c.to_hex()))
@@ -158,6 +153,16 @@ class Canvas:
         self._next_objid += 1
         return obj
 
+    def triangle(self, left, top, width, height, border=None, fill=None, angle=0):
+        if border is None:
+            border = self.fgcolor
+        if fill is None:
+            fill = Colors.Transparent
+        args = (u'triangle', left, top, width, height, border.to_hex(), fill.to_hex(), angle)
+        self._cmd_history.append((self._id, u'obj', self._next_objid, args))
+        obj = DrawingObject(self, self._next_objid, args)
+        self._next_objid += 1
+        return obj
 
 
 __all__ = [

@@ -14,12 +14,16 @@ class Color:
 
     @staticmethod
     def from_hex(value):
-        # TODO: implement
-        r = 0
-        g = 0
-        b = 0
-        a = 0
+        value = value.replace('#', '')
+        r = int(value[0:2], 16)
+        g = int(value[2:4], 16)
+        b = int(value[4:6], 16)
+        a = int(value[6:8], 16)
         return Color(r, g, b, a)
+
+    @staticmethod
+    def from_rgba(value):
+        return Color(*value)
 
     @staticmethod
     def from_bytes(value):

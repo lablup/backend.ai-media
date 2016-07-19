@@ -144,13 +144,13 @@ module.exports.Drawing = {
         last.ease = fabric.util.ease.easeInOutExpo;
         last.duration = 350;
         last.onChange = function() { canvas.renderAll(); };
-        last.onComplete = resolve;
+        last.onComplete = function() { obj.bringToFront(); resolve(); };
       } else {
         args.push({
           ease: fabric.util.ease.easeOutQuint,
           duration: 350,
           onChange: function() { canvas.renderAll(); },
-          onComplete: resolve
+          onComplete: function() { obj.bringToFront(); resolve(); }
         });
       }
       if (args[0] == 'fill' || args[0] == 'color' || args[0] == 'stroke') {
@@ -171,6 +171,8 @@ module.exports.Drawing = {
       container.appendChild(canvas_elem);
       canvas_obj = new fabric.Canvas(_id, {width: 0, height: 0});
       canvas_obj._sorna_anim = true;
+      canvas_obj._group = false;
+      canvas_obj._last_anim = [];
       this._canvas_instances[_id] = canvas_obj;
     } else {
       canvas_obj = this._canvas_instances[_id];
@@ -219,6 +221,14 @@ module.exports.Drawing = {
       case 'resume-anim':
         canvas._sorna_anim = true;
         break;
+      case 'begin-group':
+        canvas._group = true;
+        canvas._last_anim = [];
+        break;
+      case 'end-group':
+        canvas._group = false;
+        anim_chain.push(canvas._last_anim);
+        break;
       case 'obj':
         var obj_id = cmd[2];
         var args = cmd[3];
@@ -240,16 +250,20 @@ module.exports.Drawing = {
             if (canvas._sorna_anim) {
               obj.set('x2', args[1]);
               obj.set('y2', args[2]);
-              anim_chain.push([
-                  this._create_anim(canvas, obj, 'x2', args[3]),
-                  this._create_anim(canvas, obj, 'y2', args[4])
-              ]);
+              var ani = [
+                this._create_anim(canvas, obj, 'x2', args[3]),
+                this._create_anim(canvas, obj, 'y2', args[4])
+              ];
+              if (canvas._group)
+                canvas._last_anim.push.apply(canvas._last_anim, ani);
+              else
+                anim_chain.push(ani);
             }
             break;
           case 'circle':
             obj = new fabric.Circle({
-              left: args[1] - args[3],
-              top: args[2] - args[3],
+              left: args[1],
+              top: args[2],
               radius: args[3],
               originX: 'center',
               originY: 'center',
@@ -262,10 +276,14 @@ module.exports.Drawing = {
             if (canvas._sorna_anim) {
               obj.set('opacity', 0.0);
               obj.set('scale', 0.3);
-              anim_chain.push([
+              var ani = [
                 this._create_anim(canvas, obj, 'opacity', 1.0),
                 this._create_anim(canvas, obj, 'scale', 1.0)
-              ]);
+              ];
+              if (canvas._group)
+                canvas._last_anim.push.apply(canvas._last_anim, ani);
+              else
+                anim_chain.push(ani);
             }
             break;
           case 'rect':
@@ -285,10 +303,41 @@ module.exports.Drawing = {
             if (canvas._sorna_anim) {
               obj.set('opacity', 0.0);
               obj.set('scale', 0.3);
-              anim_chain.push([
+              var ani = [
                 this._create_anim(canvas, obj, 'opacity', 1.0),
                 this._create_anim(canvas, obj, 'scale', 1.0)
-              ]);
+              ];
+              if (canvas._group)
+                canvas._last_anim.push.apply(canvas._last_anim, ani);
+              else
+                anim_chain.push(ani);
+            }
+            break;
+          case 'triangle':
+            obj = new fabric.Triangle({
+              left: args[1],
+              top: args[2],
+              width: args[3],
+              height: args[4],
+              originX: 'center',
+              originY: 'center',
+              stroke: this.hex2rgba(args[5]),
+              fill: this.hex2rgba(args[6]),
+              angle: args[7],
+              strokeWidth: 2,
+              selectable: false
+            });
+            if (canvas._sorna_anim) {
+              obj.set('opacity', 0.0);
+              obj.set('scale', 0.3);
+              var ani = [
+                this._create_anim(canvas, obj, 'opacity', 1.0),
+                this._create_anim(canvas, obj, 'scale', 1.0)
+              ];
+              if (canvas._group)
+                canvas._last_anim.push.apply(canvas._last_anim, ani);
+              else
+                anim_chain.push(ani);
             }
             break;
           default:
@@ -310,67 +359,93 @@ module.exports.Drawing = {
         var val = cmd[4];
         switch (prop) {
         case 'x':
-          if (obj.type == 'circle') val -= obj.radius;
           if (canvas._sorna_anim) {
-            anim_chain.push([
+            var ani = [
               this._create_anim(canvas, obj, 'left', val)
-            ]);
+            ];
+            if (canvas._group)
+              canvas._last_anim.push.apply(canvas._last_anim, ani);
+            else
+              anim_chain.push(ani);
           } else {
             obj.set('left', val);
           }
           break;
         case 'y':
-          if (obj.type == 'circle') val -= obj.radius;
           if (canvas._sorna_anim) {
-            anim_chain.push([
+            var ani = [
               this._create_anim(canvas, obj, 'top', val)
-            ]);
+            ];
+            if (canvas._group)
+              canvas._last_anim.push.apply(canvas._last_anim, ani);
+            else
+              anim_chain.push(ani);
           } else {
             obj.set('top', val);
           }
           break;
         case 'x1':
           if (canvas._sorna_anim) {
-            anim_chain.push([
+            var ani = [
               this._create_anim(canvas, obj, 'x1', val)
-            ]);
+            ];
+            if (canvas._group)
+              canvas._last_anim.push.apply(canvas._last_anim, ani);
+            else
+              anim_chain.push(ani);
           } else {
             obj.set('x1', val);
           }
           break;
         case 'y1':
           if (canvas._sorna_anim) {
-            anim_chain.push([
+            var ani = [
               this._create_anim(canvas, obj, 'y1', val)
-            ]);
+            ];
+            if (canvas._group)
+              canvas._last_anim.push.apply(canvas._last_anim, ani);
+            else
+              anim_chain.push(ani);
           } else {
             obj.set('y1', val);
           }
           break;
         case 'x2':
           if (canvas._sorna_anim) {
-            anim_chain.push([
+            var ani = [
               this._create_anim(canvas, obj, 'x2', val)
-            ]);
+            ];
+            if (canvas._group)
+              canvas._last_anim.push.apply(canvas._last_anim, ani);
+            else
+              anim_chain.push(ani);
           } else {
             obj.set('x2', val);
           }
           break;
         case 'y2':
           if (canvas._sorna_anim) {
-            anim_chain.push([
+            var ani = [
               this._create_anim(canvas, obj, 'y2', val)
-            ]);
+            ];
+            if (canvas._group)
+              canvas._last_anim.push.apply(canvas._last_anim, ani);
+            else
+              anim_chain.push(ani);
           } else {
             obj.set('y2', val);
           }
           break;
         case 'rotate':
           if (canvas._sorna_anim) {
-            anim_chain.push([
+            var ani = [
               (val >= 0) ? this._create_anim(canvas, obj, 'angle', '+=' + val)
                          : this._create_anim(canvas, obj, 'angle', '-=' + Math.abs(val))
-            ]);
+            ];
+            if (canvas._group)
+              canvas._last_anim.push.apply(canvas._last_anim, ani);
+            else
+              anim_chain.push(ani);
           } else {
             var cur = obj.get('angle');
             obj.set('angle', cur + val);
@@ -378,45 +453,65 @@ module.exports.Drawing = {
           break;
         case 'angle':
           if (canvas._sorna_anim) {
-            anim_chain.push([
+            var ani = [
               this._create_anim(canvas, obj, 'angle', val)
-            ]);
+            ];
+            if (canvas._group)
+              canvas._last_anim.push.apply(canvas._last_anim, ani);
+            else
+              anim_chain.push(ani);
           } else {
             obj.set('angle', val);
           }
           break;
         case 'radius':
           if (canvas._sorna_anim) {
-            anim_chain.push([
+            var ani = [
               this._create_anim(canvas, obj, 'radius', val)
-            ]);
+            ];
+            if (canvas._group)
+              canvas._last_anim.push.apply(canvas._last_anim, ani);
+            else
+              anim_chain.push(ani);
           } else {
             obj.set('radius', val);
           }
           break;
         case 'color':
           if (canvas._sorna_anim) {
-            anim_chain.push([
+            var ani = [
               this._create_anim(canvas, obj, 'color', this.hex2rgba(val))
-            ]);
+            ];
+            if (canvas._group)
+              canvas._last_anim.push.apply(canvas._last_anim, ani);
+            else
+              anim_chain.push(ani);
           } else {
             obj.set('color', this.hex2rgba(val));
           }
           break;
         case 'border':
           if (canvas._sorna_anim) {
-            anim_chain.push([
+            var ani = [
               this._create_anim(canvas, obj, 'stroke', this.hex2rgba(val)),
-            ]);
+            ];
+            if (canvas._group)
+              canvas._last_anim.push.apply(canvas._last_anim, ani);
+            else
+              anim_chain.push(ani);
           } else {
             obj.set('stroke', this.hex2rgba(val));
           }
           break;
         case 'fill':
           if (canvas._sorna_anim) {
-            anim_chain.push([
+            var ani = [
               this._create_anim(canvas, obj, 'fill', this.hex2rgba(val))
-            ]);
+            ];
+            if (canvas._group)
+              canvas._last_anim.push.apply(canvas._last_anim, ani);
+            else
+              anim_chain.push(ani);
           } else {
             obj.set('fill', this.hex2rgba(val));
           }
