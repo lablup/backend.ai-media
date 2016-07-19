@@ -227,54 +227,69 @@ module.exports.Drawing = {
           // create
           switch (args[0]) {
           case 'line':
+            obj = new fabric.Line([
+              args[1], args[2],
+              args[3], args[4]
+            ], {
+              originX: 'center',
+              originY: 'center',
+              stroke: this.hex2rgba(args[5]),
+              strokeWidth: 2,
+              selectable: false
+            });
             if (canvas._sorna_anim) {
-              obj = new fabric.Line([
-                args[1], args[2],
-                args[1], args[2] // start from x1,y1
-              ], {
-                stroke: this.hex2rgba(args[5]),
-                selectable: false
-              });
+              obj.set('x2', args[1]);
+              obj.set('y2', args[2]);
               anim_chain.push([
                   this._create_anim(canvas, obj, 'x2', args[3]),
                   this._create_anim(canvas, obj, 'y2', args[4])
               ]);
-            } else {
-              obj = new fabric.Line([
-                args[1], args[2],
-                args[3], args[4]
-              ], {
-                stroke: this.hex2rgba(args[5]),
-                selectable: false
-              });
             }
             break;
           case 'circle':
-            // TODO: implement animated creation
             obj = new fabric.Circle({
               left: args[1] - args[3],
               top: args[2] - args[3],
               radius: args[3],
+              originX: 'center',
+              originY: 'center',
               stroke: this.hex2rgba(args[4]),
               fill: this.hex2rgba(args[5]),
               angle: args[6],
               strokeWidth: 2,
               selectable: false
             });
+            if (canvas._sorna_anim) {
+              obj.set('opacity', 0.0);
+              obj.set('scale', 0.3);
+              anim_chain.push([
+                this._create_anim(canvas, obj, 'opacity', 1.0),
+                this._create_anim(canvas, obj, 'scale', 1.0)
+              ]);
+            }
             break;
           case 'rect':
-            // TODO: implement animated creation
             obj = new fabric.Rect({
               left: args[1],
               top: args[2],
               width: args[3],
               height: args[4],
+              originX: 'center',
+              originY: 'center',
               stroke: this.hex2rgba(args[5]),
               fill: this.hex2rgba(args[6]),
               angle: args[7],
               strokeWidth: 2,
               selectable: false
             });
+            if (canvas._sorna_anim) {
+              obj.set('opacity', 0.0);
+              obj.set('scale', 0.3);
+              anim_chain.push([
+                this._create_anim(canvas, obj, 'opacity', 1.0),
+                this._create_anim(canvas, obj, 'scale', 1.0)
+              ]);
+            }
             break;
           default:
             obj = null;
