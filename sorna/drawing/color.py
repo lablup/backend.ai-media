@@ -28,17 +28,17 @@ class Color:
 
     def to_hex(self, include_alpha=True):
         if include_alpha:
-            return '#{:02x}{:02x}{:02x}{:02x}'.format(
+            return u'#{:02x}{:02x}{:02x}{:02x}'.format(
                 self.red, self.green, self.blue, self.alpha)
         else:
-            return '#{:02x}{:02x}{:02x}'.format(
+            return u'#{:02x}{:02x}{:02x}'.format(
                 self.red, self.green, self.blue)
 
     def to_bytes(self):
         return rgba.pack(self.red, self.green, self.blue, self.alpha)
 
     def to_rgba(self):
-        return 'rgba({},{},{})'.format(self.red, self.green, self.blue, self.alpha)
+        return u'rgba({},{},{})'.format(self.red, self.green, self.blue, self.alpha)
 
 
 class Colors(Color, enum.Enum):

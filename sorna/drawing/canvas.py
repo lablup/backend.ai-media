@@ -20,61 +20,61 @@ class DrawingObject:
             self._canvas._cmd_history.append((self._cavnas._id, 'update', self._id, 'x', x))
 
     def set_y(self, y):
-        if self._args[0] in ('rect', 'circle'):
+        if self._args[0] in (u'rect', u'circle'):
             self._args[2] = y
             self._canvas._cmd_history.append((self._canvas._id, 'update', self._id, 'y', y))
 
     def set_x1(self, x):
-        if self._args[0] == 'line':
+        if self._args[0] == u'line':
             self._args[1] = x
             self._canvas._cmd_history.append((self._cavnas._id, 'update', self._id, 'x1', x))
 
     def set_y1(self, y):
-        if self._args[0] == 'line':
+        if self._args[0] == u'line':
             self._args[2] = y
-            self._canvas._cmd_history.append((self._canvas._id, 'update', self._id, 'y1', y))
+            self._canvas._cmd_history.append((self._canvas._id, u'update', self._id, u'y1', y))
 
     def set_x2(self, x):
-        if self._args[0] == 'line':
+        if self._args[0] == u'line':
             self._args[3] = x
-            self._canvas._cmd_history.append((self._canvas._id, 'update', self._id, 'x2', x))
+            self._canvas._cmd_history.append((self._canvas._id, u'update', self._id, u'x2', x))
 
     def set_y2(self, y):
-        if self._args[0] == 'line':
+        if self._args[0] == u'line':
             self._args[4] = y
-            self._canvas._cmd_history.append((self._canvas._id, 'update', self._id, 'y2', y))
+            self._canvas._cmd_history.append((self._canvas._id, u'update', self._id, u'y2', y))
 
     def set_radius(self, r):
-        if self._args[0] == 'circle':
+        if self._args[0] == u'circle':
             self._args[3] = r
-            self._canvas._cmd_history.append((self._canvas._id, 'update', self._id, 'radius', r))
+            self._canvas._cmd_history.append((self._canvas._id, u'update', self._id, u'radius', r))
 
     def rotate(self, a):
-        self._canvas._cmd_history.append((self._canvas._id, 'update', self._id, 'rotate', a))
+        self._canvas._cmd_history.append((self._canvas._id, 'update', self._id, u'rotate', a))
 
     def set_angle(self, a):
-        self._canvas._cmd_history.append((self._canvas._id, 'update', self._id, 'angle', a))
+        self._canvas._cmd_history.append((self._canvas._id, 'update', self._id, u'angle', a))
 
     def stroke(self, color):
         color = color.to_hex()
-        if self._args[0] == 'line':
+        if self._args[0] == u'line':
             self._args[5] = color
-            self._canvas._cmd_history.append((self._canvas._id, 'update', self._id, 'color', color))
-        elif self._args[0] == 'circle':
+            self._canvas._cmd_history.append((self._canvas._id, u'update', self._id, u'color', color))
+        elif self._args[0] == u'circle':
             self._args[4] = color
-            self._canvas._cmd_history.append((self._canvas._id, 'update', self._id, 'border', color))
-        elif self._args[0] == 'rect':
+            self._canvas._cmd_history.append((self._canvas._id, u'update', self._id, u'border', color))
+        elif self._args[0] == u'rect':
             self._args[5] = color
-            self._canvas._cmd_history.append((self._canvas._id, 'update', self._id, 'border', color))
+            self._canvas._cmd_history.append((self._canvas._id, u'update', self._id, u'border', color))
 
     def fill(self, color):
         color = color.to_hex()
-        if self._args[0] == 'circle':
+        if self._args[0] == u'circle':
             self._args[5] = color
-            self._canvas._cmd_history.append((self._canvas._id, 'update', self._id, 'fill', color))
-        elif self._args[0] == 'rect':
+            self._canvas._cmd_history.append((self._canvas._id, u'update', self._id, u'fill', color))
+        elif self._args[0] == u'rect':
             self._args[6] = color
-            self._canvas._cmd_history.append((self._canvas._id, 'update', self._id, 'fill', color))
+            self._canvas._cmd_history.append((self._canvas._id, u'update', self._id, u'fill', color))
 
 
 class Canvas:
@@ -85,7 +85,7 @@ class Canvas:
         _canvas_id_counter += 1
         self._cmd_history = []
         self._next_objid = 0
-        self._cmd_history.append((self._id, 'canvas',
+        self._cmd_history.append((self._id, u'canvas',
                                  width, height,
                                  bgcolor.to_hex(),
                                  fgcolor.to_hex()))
@@ -94,7 +94,7 @@ class Canvas:
 
     def update(self):
         builtins._sorna_media.append((
-            'application/x-sorna-drawing',
+            u'application/x-sorna-drawing',
             encode_commands(self._cmd_history)
         ))
         self._cmd_history = []
@@ -108,30 +108,30 @@ class Canvas:
         pass
 
     def stop_animation(self):
-        self._cmd_history.append((self._id, 'stop-anim',))
+        self._cmd_history.append((self._id, u'stop-anim',))
 
     def resume_animation(self):
-        self._cmd_history.append((self._id, 'resume-anim',))
+        self._cmd_history.append((self._id, u'resume-anim',))
 
     def begin_fill(self, c):
-        self._cmd_history.append((self._id, 'begin-fill', c.to_hex()))
+        self._cmd_history.append((self._id, u'begin-fill', c.to_hex()))
 
     def end_fill(self):
-        self._cmd_history.append((self._id, 'end-fill',))
+        self._cmd_history.append((self._id, u'end-fill',))
 
     def background_color(self, c):
         self.bgcolor = c
-        self._cmd_history.append((self._id, 'bgcolor', c.to_hex()))
+        self._cmd_history.append((self._id, u'bgcolor', c.to_hex()))
 
     def stroke_color(self, c):
         self.fgcolor = c
-        self._cmd_history.append((self._id, 'fgcolor', c.to_hex()))
+        self._cmd_history.append((self._id, u'fgcolor', c.to_hex()))
 
     def line(self, x0, y0, x1, y1, color=None):
         if color is None:
             color = self.fgcolor
-        args = ('line', x0, y0, x1, y1, color.to_hex())
-        self._cmd_history.append((self._id, 'obj', self._next_objid, args))
+        args = (u'line', x0, y0, x1, y1, color.to_hex())
+        self._cmd_history.append((self._id, u'obj', self._next_objid, args))
         obj = DrawingObject(self, self._next_objid, args)
         self._next_objid += 1
         return obj
@@ -141,8 +141,8 @@ class Canvas:
             border = self.fgcolor
         if fill is None:
             fill = Colors.Transparent
-        args = ('circle', x, y, radius, border.to_hex(), fill.to_hex(), angle)
-        self._cmd_history.append((self._id, 'obj', self._next_objid, args))
+        args = (u'circle', x, y, radius, border.to_hex(), fill.to_hex(), angle)
+        self._cmd_history.append((self._id, u'obj', self._next_objid, args))
         obj = DrawingObject(self, self._next_objid, args)
         self._next_objid += 1
         return obj
@@ -152,8 +152,8 @@ class Canvas:
             border = self.fgcolor
         if fill is None:
             fill = Colors.Transparent
-        args = ('rect', left, top, width, height, border.to_hex(), fill.to_hex(), angle)
-        self._cmd_history.append((self._id, 'obj', self._next_objid, args))
+        args = (u'rect', left, top, width, height, border.to_hex(), fill.to_hex(), angle)
+        self._cmd_history.append((self._id, u'obj', self._next_objid, args))
         obj = DrawingObject(self, self._next_objid, args)
         self._next_objid += 1
         return obj
