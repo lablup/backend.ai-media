@@ -98,17 +98,25 @@ Sorna.Media = {
           container.appendChild(outer_elem);
         }
         var canvas = new fabric.StaticCanvas(result_id, {width: 0, height: 0});
-        canvas.enableRetinaScaling = true;
+        //canvas.enableRetinaScaling = true;  // does not work for SVG import
+        canvas_elem.getContext('2d').scale(window.devicePixelRatio, window.devicePixelRatio);
         fabric.loadSVGFromString(data, function(objects, options) {
           options.selectable = false;
           var shape = fabric.util.groupSVGElements(objects, options);
-          var dl_wrap = document.createElement('div');
-          var dl = document.createElement('a');
-          dl.href = 'data:image/svg+xml,' + encodeURIComponent(data);
-          dl.setAttribute('class', 'media-download');
-          dl.target = '_blank';
-          dl.innerHTML = 'Download as SVG';
-          dl_wrap.appendChild(dl);
+          var dl_wrap = document.getElementById(result_id + '-download');
+          if (!dl_wrap) {
+            dl_wrap = document.createElement('div');
+            dl_wrap.id = result_id + '-download';
+            var dl = document.createElement('a');
+            dl.href = 'data:image/svg+xml,' + encodeURIComponent(data);
+            dl.setAttribute('class', 'media-download');
+            dl.target = '_blank';
+            dl.innerHTML = 'Download as SVG';
+            dl_wrap.appendChild(dl);
+          } else {
+            var dl = dl_wrap.childNodes[0];
+            dl.href = 'data:image/svg+xml,' + encodeURIComponent(data);
+          }
           canvas.lowerCanvasEl.parentNode.appendChild(dl_wrap);
           canvas.setWidth(shape.width || 600);
           canvas.setHeight(shape.height || 600);
