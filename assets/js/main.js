@@ -67,10 +67,10 @@ Sorna.Media = {
         if (!img_elem) {
           var outer_elem = document.createElement('div');
           outer_elem.setAttribute('class', 'media-item media-image');
-          outer_elem.style = 'text-align: center; margin: 5px;';
+          outer_elem.style.cssText = 'text-align: center; margin: 5px;';
           img_elem = document.createElement('img');
           img_elem.id = result_id;
-          img_elem.style = 'margin: 0 auto; max-width: 100%; height: auto;';
+          img_elem.style.cssText = 'margin: 0 auto; max-width: 100%; height: auto;';
           img_elem.alt = 'generated image';
           outer_elem.appendChild(img_elem);
           container.appendChild(outer_elem);
@@ -90,10 +90,10 @@ Sorna.Media = {
         if (!canvas_elem) {
           var outer_elem = document.createElement('div');
           outer_elem.setAttribute('class', 'media-item media-image');
-          outer_elem.style = 'text-align: center; margin: 5px;';
+          outer_elem.style.cssText = 'text-align: center; margin: 5px;';
           canvas_elem = document.createElement('canvas');
           canvas_elem.id = result_id;
-          canvas_elem.style = 'margin: 0 auto; max-width: 100%; height: auto;';
+          canvas_elem.style.cssText = 'margin: 0 auto; max-width: 100%; height: auto;';
           outer_elem.appendChild(canvas_elem);
           container.appendChild(outer_elem);
         }

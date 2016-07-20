@@ -177,10 +177,10 @@ module.exports.Drawing = {
     if (!canvas_elem) {
       var outer_elem = document.createElement('div');
       outer_elem.setAttribute('class', 'media-item media-drawing');
-      outer_elem.style = 'text-align: center; margin: 5px;';
+      outer_elem.style.cssText = 'text-align: center; margin: 5px;';
       canvas_elem = document.createElement('canvas');
       canvas_elem.id = _id;
-      canvas_elem.style = 'margin: 0 auto; max-width: 100%; height: auto;';
+      canvas_elem.style.cssText = 'margin: 0 auto; max-width: 100%; height: auto;';
       outer_elem.appendChild(canvas_elem);
       container.appendChild(outer_elem);
       canvas_obj = new fabric.StaticCanvas(_id, {width: 0, height: 0});
