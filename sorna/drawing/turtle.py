@@ -48,6 +48,7 @@ class Turtle:
     def __init__(self, canvas):
         self.canvas = canvas
         self.points = []
+        self.pen = True
         w = self.canvas.width
         h = self.canvas.height
         self.cursor = self.canvas.triangle(
@@ -64,7 +65,9 @@ class Turtle:
         x_diff = math.sin(math.radians(self.angle)) * amt
         y_diff = -1 * math.cos(math.radians(self.angle)) * amt
         self.canvas.begin_group()
-        self.canvas.line(x, y, x + x_diff, y + y_diff, color=Colors.from_rgba([255, 0, 0, 128]))
+        if self.pen:
+            self.canvas.line(x, y, x + x_diff, y + y_diff,
+                             color=Colors.from_rgba([255, 0, 0, 128]))
         self.cursor.set_x(x + x_diff)
         self.cursor.set_y(y + y_diff)
         self.canvas.end_group()
@@ -79,8 +82,31 @@ class Turtle:
         self.angle += deg
 
     def pos(self):
-        return Vec2D(self.points[-1][0] - self.points[0][0],
-                     self.points[-1][1] - self.points[0][1])
+        base_x, base_y = self.points[0][0], self.points[0][1]
+        return Vec2D(self.points[-1][0] - base_x,
+                     self.points[-1][1] - base_y)
+
+    def penup(self):
+        self.pen = False
+
+    def pendown(self):
+        self.pen = True
+
+    def setpos(self, x, y=None):
+        base_x, base_y = self.points[0][0], self.points[0][1]
+        if y is None:
+            _x = x[0]
+            _y = x[1]
+            x, y = _x, _y
+        self.canvas.begin_group()
+        if self.pen:
+            self.canvas.line(self.points[-1][0], self.points[-1][1],
+                             x + base_x, y + base_y,
+                             color=Colors.from_rgba([255, 0, 0, 128]))
+        self.cursor.set_x(x + base_x)
+        self.cursor.set_y(y + base_y)
+        self.canvas.end_group()
+        self.points.append((x + base_x, y + base_y))
 
 
 __all__ = [

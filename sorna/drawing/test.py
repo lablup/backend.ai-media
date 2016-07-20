@@ -87,3 +87,12 @@ class TurtleFunctionalTest(unittest.TestCase):
         self.assertAlmostEqual(1, abs(v))
         v = Vec2D(1, 1)
         self.assertAlmostEqual(math.sqrt(2), abs(v))
+
+    def test_pos(self):
+        c = Canvas(100, 100)
+        t = Turtle(c)
+        t.setpos(10, 10)
+        self.assertTupleEqual((10, 10), t.pos())
+        t.setpos(Vec2D(50, 50))
+        self.assertTupleEqual((50, 50), t.pos())
+
