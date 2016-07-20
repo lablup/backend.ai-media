@@ -101,7 +101,6 @@ module.exports.Drawing = {
           options.from = currentValue;
         }
 
-
         fabric.util.animateColor(options.from, to, options.duration, {
           startValue: options.from,
           endValue: to,
@@ -125,7 +124,6 @@ module.exports.Drawing = {
           onComplete: function() {
             if (skipCallbacks)
               return;
-            _this.setCoords();
             options.onComplete && options.onComplete();
           }
         });
@@ -143,15 +141,14 @@ module.exports.Drawing = {
       var args = _args.slice(2);
       var last = args[args.length - 1];
       if (typeof last == 'object') {
+        var _orig_complete = last.onComplete;
         last.ease = fabric.util.ease.easeInOutExpo;
         last.duration = _this._animation_duration;
-        last.onChange = function() { canvas.renderAll(); };
-        last.onComplete = function() { obj.bringToFront(); resolve(); };
+        last.onComplete = function() { _orig_complete && _orig_complete(); obj.bringToFront(); resolve(); };
       } else {
         args.push({
           ease: fabric.util.ease.easeOutQuint,
           duration: _this._animation_duration,
-          onChange: function() { canvas.renderAll(); },
           onComplete: function() { obj.bringToFront(); resolve(); }
         });
       }
@@ -446,7 +443,6 @@ module.exports.Drawing = {
           break;
         case 'rotate':
           if (canvas._sorna_anim) {
-            var opts = { onComplete: function() { obj.set('angle', obj.get('angle') + val); } };
             var ani = [
               (val >= 0) ? this._create_anim(canvas, obj, 'angle', '+=' + val)
                          : this._create_anim(canvas, obj, 'angle', '-=' + Math.abs(val))
@@ -526,14 +522,29 @@ module.exports.Drawing = {
           }
           break;
         }
-      }
+      } // endswitch
       Sorna.Utils.async_series(anim_chain, function(anim_group) {
+        // Our own animation loop because grouped animation causes
+        // severe frame drops due to overlapping of multiple
+        // animation loops with "canvas.renderAll()".
+        var finish = (+new Date()) + _this._animation_duration;
+        var anim_id;
+        function anim_loop() {
+          var time = +new Date();
+          if (time > finish) { return; }
+          anim_id = fabric.util.requestAnimFrame(anim_loop);
+          canvas.renderAll();
+        };
+        anim_id = fabric.util.requestAnimFrame(anim_loop);
+
         var subanims = [];
         anim_group.forEach(function(subanim) {
           subanims.push(new Promise(subanim));
         });
+
         return new Promise(function(resolve) {
           Promise.all(subanims).then(function() {
+            window.cancelAnimationFrame(anim_id);
             setTimeout(resolve, _this._delay_between_animations);
           });
         });

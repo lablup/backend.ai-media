@@ -102,12 +102,14 @@ Sorna.Media = {
         fabric.loadSVGFromString(data, function(objects, options) {
           options.selectable = false;
           var shape = fabric.util.groupSVGElements(objects, options);
+          var dl_wrap = document.createElement('div');
           var dl = document.createElement('a');
           dl.href = 'data:image/svg+xml,' + encodeURIComponent(data);
           dl.setAttribute('class', 'media-download');
           dl.target = '_blank';
           dl.innerHTML = 'Download as SVG';
-          canvas.lowerCanvasEl.parentNode.appendChild(dl);
+          dl_wrap.appendChild(dl);
+          canvas.lowerCanvasEl.parentNode.appendChild(dl_wrap);
           canvas.setWidth(shape.width || 600);
           canvas.setHeight(shape.height || 600);
           canvas.lowerCanvasEl.style.height = 'auto';
