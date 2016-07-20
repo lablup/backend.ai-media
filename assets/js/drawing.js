@@ -16,7 +16,8 @@ module.exports.Drawing = {
   _canvas_instances: {},
   _obj_map: {},
   _patched_fabric: false,
-  _delay_between_animations: 300,
+  _animation_duration: 180,
+  _delay_between_animations: 120,
 
   _patch_fabric: function() {
     // Extend fabric.js's animation for color properties
@@ -135,6 +136,7 @@ module.exports.Drawing = {
 
   _create_anim: function(/* variable args */) {
     var _args = Array.prototype.slice.call(arguments);
+    var _this = this;
     return function(resolve) {
       var canvas = _args[0];
       var obj = _args[1];
@@ -142,13 +144,13 @@ module.exports.Drawing = {
       var last = args[args.length - 1];
       if (typeof last == 'object') {
         last.ease = fabric.util.ease.easeInOutExpo;
-        last.duration = 350;
+        last.duration = _this._animation_duration;
         last.onChange = function() { canvas.renderAll(); };
         last.onComplete = function() { obj.bringToFront(); resolve(); };
       } else {
         args.push({
           ease: fabric.util.ease.easeOutQuint,
-          duration: 350,
+          duration: _this._animation_duration,
           onChange: function() { canvas.renderAll(); },
           onComplete: function() { obj.bringToFront(); resolve(); }
         });
@@ -438,6 +440,7 @@ module.exports.Drawing = {
           break;
         case 'rotate':
           if (canvas._sorna_anim) {
+            var opts = { onComplete: function() { obj.set('angle', obj.get('angle') + val); } };
             var ani = [
               (val >= 0) ? this._create_anim(canvas, obj, 'angle', '+=' + val)
                          : this._create_anim(canvas, obj, 'angle', '-=' + Math.abs(val))
