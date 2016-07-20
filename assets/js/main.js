@@ -65,10 +65,15 @@ Sorna.Media = {
       handler: function(result_id, type, data, container) {
         var img_elem = document.getElementById(result_id);
         if (!img_elem) {
+          var outer_elem = document.createElement('div');
+          outer_elem.setAttribute('class', 'media-item media-image');
+          outer_elem.style = 'text-align: center; margin: 5px;';
           img_elem = document.createElement('img');
           img_elem.id = result_id;
+          img_elem.style = 'margin: 0 auto; max-width: 100%; height: auto;';
           img_elem.alt = 'generated image';
-          container.appendChild(img_elem);
+          outer_elem.appendChild(img_elem);
+          container.appendChild(outer_elem);
         }
         // TODO: verify dataURI format?
         img_elem.src = data;
@@ -83,24 +88,29 @@ Sorna.Media = {
       handler: function(result_id, type, data, container) {
         var canvas_elem = document.getElementById(result_id);
         if (!canvas_elem) {
+          var outer_elem = document.createElement('div');
+          outer_elem.setAttribute('class', 'media-item media-image');
+          outer_elem.style = 'text-align: center; margin: 5px;';
           canvas_elem = document.createElement('canvas');
           canvas_elem.id = result_id;
-          container.appendChild(canvas_elem);
+          canvas_elem.style = 'margin: 0 auto; max-width: 100%; height: auto;';
+          outer_elem.appendChild(canvas_elem);
+          container.appendChild(outer_elem);
         }
-        var canvas = new fabric.Canvas(result_id, {width: 0, height: 0});
+        var canvas = new fabric.StaticCanvas(result_id, {width: 0, height: 0});
         canvas_elem.getContext('2d').scale(window.devicePixelRatio, window.devicePixelRatio);
         fabric.loadSVGFromString(data, function(objects, options) {
           options.selectable = false;
           var shape = fabric.util.groupSVGElements(objects, options);
-          canvas.on('mouse:up', function(opts) {
-            var data = canvas.toSVG();
-            var dl = document.createElement('a');
-            dl.href = 'data:image/svg+xml,' + encodeURIComponent(data);
-            dl.target = '_blank';
-            dl.click();
-          });
+          var dl = document.createElement('a');
+          dl.href = 'data:image/svg+xml,' + encodeURIComponent(data);
+          dl.setAttribute('class', 'media-download');
+          dl.target = '_blank';
+          dl.innerHTML = 'Download as SVG';
+          canvas.lowerCanvasEl.parentNode.appendChild(dl);
           canvas.setWidth(shape.width || 600);
           canvas.setHeight(shape.height || 600);
+          canvas.lowerCanvasEl.style.height = 'auto';
           canvas.add(shape);
           canvas.renderAll();
         });

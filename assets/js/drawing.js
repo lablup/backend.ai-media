@@ -168,10 +168,15 @@ module.exports.Drawing = {
     var canvas_elem = document.getElementById(_id);
     var canvas_obj = null;
     if (!canvas_elem) {
+      var outer_elem = document.createElement('div');
+      outer_elem.setAttribute('class', 'media-item media-drawing');
+      outer_elem.style = 'text-align: center; margin: 5px;';
       canvas_elem = document.createElement('canvas');
       canvas_elem.id = _id;
-      container.appendChild(canvas_elem);
-      canvas_obj = new fabric.Canvas(_id, {width: 0, height: 0});
+      canvas_elem.style = 'margin: 0 auto; max-width: 100%; height: auto;';
+      outer_elem.appendChild(canvas_elem);
+      container.appendChild(outer_elem);
+      canvas_obj = new fabric.StaticCanvas(_id, {width: 0, height: 0});
       canvas_obj._sorna_anim = true;
       canvas_obj._group = false;
       canvas_obj._last_anim = [];
@@ -215,6 +220,7 @@ module.exports.Drawing = {
         canvas.setWidth(cmd[2]);
         canvas.setHeight(cmd[3]);
         canvas.setBackgroundColor(this.hex2rgba(cmd[4]));
+        canvas.lowerCanvasEl.style.height = 'auto';
         canvas._sorna_default_fgcolor = this.hex2rgba(cmd[5]);
         break;
       case 'stop-anim':
