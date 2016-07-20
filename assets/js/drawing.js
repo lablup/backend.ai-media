@@ -142,14 +142,24 @@ module.exports.Drawing = {
       var last = args[args.length - 1];
       if (typeof last == 'object') {
         var _orig_complete = last.onComplete;
-        last.ease = fabric.util.ease.easeInOutExpo;
+        var _begin_val;
+        last.ease = fabric.util.ease.easeOutQuad;
         last.duration = _this._animation_duration;
-        last.onComplete = function() { _orig_complete && _orig_complete(); obj.bringToFront(); resolve(); };
+        if (args[0] == 'angle')
+          _begin_val = obj.get('angle');
+        last.onComplete = function() {
+          _orig_complete && _orig_complete(_begin_val);
+          obj.bringToFront();
+          resolve();
+        };
       } else {
         args.push({
-          ease: fabric.util.ease.easeOutQuint,
+          ease: fabric.util.ease.easeOutQuad,
           duration: _this._animation_duration,
-          onComplete: function() { obj.bringToFront(); resolve(); }
+          onComplete: function() {
+            obj.bringToFront();
+            resolve();
+          }
         });
       }
       if (args[0] == 'fill' || args[0] == 'color' || args[0] == 'stroke') {
@@ -174,6 +184,7 @@ module.exports.Drawing = {
       outer_elem.appendChild(canvas_elem);
       container.appendChild(outer_elem);
       canvas_obj = new fabric.StaticCanvas(_id, {width: 0, height: 0});
+      canvas_obj.enableRetinaScaling = true;
       canvas_obj._sorna_anim = true;
       canvas_obj._group = false;
       canvas_obj._last_anim = [];
@@ -443,9 +454,19 @@ module.exports.Drawing = {
           break;
         case 'rotate':
           if (canvas._sorna_anim) {
+            var opts = {
+              onComplete: function(_begin_val) {
+                var new_val = _begin_val + val;
+                if (new_val < -360)
+                  new_val += 360;
+                if (new_val > 360)
+                  new_val -= 360;
+                obj.set('angle', new_val);
+              }
+            };
             var ani = [
-              (val >= 0) ? this._create_anim(canvas, obj, 'angle', '+=' + val)
-                         : this._create_anim(canvas, obj, 'angle', '-=' + Math.abs(val))
+              (val >= 0) ? this._create_anim(canvas, obj, 'angle', '+=' + val, opts)
+                         : this._create_anim(canvas, obj, 'angle', '-=' + Math.abs(val), opts)
             ];
             if (canvas._group)
               canvas._last_anim.push.apply(canvas._last_anim, ani);
@@ -523,36 +544,37 @@ module.exports.Drawing = {
           break;
         }
       } // endswitch
-      Sorna.Utils.async_series(anim_chain, function(anim_group) {
-        // Our own animation loop because grouped animation causes
-        // severe frame drops due to overlapping of multiple
-        // animation loops with "canvas.renderAll()".
-        var finish = (+new Date()) + _this._animation_duration;
-        var anim_id;
-        function anim_loop() {
-          var time = +new Date();
-          if (time > finish) { return; }
-          anim_id = fabric.util.requestAnimFrame(anim_loop);
-          canvas.renderAll();
-        };
-        anim_id = fabric.util.requestAnimFrame(anim_loop);
-
-        var subanims = [];
-        anim_group.forEach(function(subanim) {
-          subanims.push(new Promise(subanim));
-        });
-
-        return new Promise(function(resolve) {
-          Promise.all(subanims).then(function() {
-            window.cancelAnimationFrame(anim_id);
-            setTimeout(resolve, _this._delay_between_animations);
-          });
-        });
-      }).then(function(results) {
-        canvas.renderAll();
-      });
       canvas.renderAll();
     }
+    Sorna.Utils.async_series(anim_chain, function(anim_group) {
+      // Our own animation loop because grouped animation causes
+      // severe frame drops due to overlapping of multiple
+      // animation loops with "canvas.renderAll()".
+      var finish = (+new Date()) + _this._animation_duration;
+      var anim_id;
+      function anim_loop() {
+        var time = +new Date();
+        if (time > finish) { return; }
+        anim_id = window.requestAnimationFrame(anim_loop);
+        canvas.renderAll();
+      };
+      anim_id = window.requestAnimationFrame(anim_loop);
+
+      var subanims = [];
+      anim_group.forEach(function(subanim) {
+        subanims.push(new Promise(subanim));
+      });
+
+      return new Promise(function(resolve) {
+        Promise.all(subanims).then(function() {
+          // Maybe already cancelled but ensure that.
+          window.cancelAnimationFrame(anim_id);
+          setTimeout(resolve, _this._delay_between_animations);
+        });
+      });
+    }).then(function(results) {
+      canvas.renderAll();
+    });
   }
 };
 

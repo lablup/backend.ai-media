@@ -98,7 +98,7 @@ Sorna.Media = {
           container.appendChild(outer_elem);
         }
         var canvas = new fabric.StaticCanvas(result_id, {width: 0, height: 0});
-        canvas_elem.getContext('2d').scale(window.devicePixelRatio, window.devicePixelRatio);
+        canvas.enableRetinaScaling = true;
         fabric.loadSVGFromString(data, function(objects, options) {
           options.selectable = false;
           var shape = fabric.util.groupSVGElements(objects, options);
