@@ -260,6 +260,7 @@ module.exports.Drawing = {
           canvas.setWidth(cmd[2]);
           canvas.setHeight(cmd[3]);
           canvas.setBackgroundColor(this.hex2rgba(cmd[4]));
+          canvas.clear();
           canvas.lowerCanvasEl.style.height = 'auto';
           canvas._sorna_default_fgcolor = this.hex2rgba(cmd[5]);
           break;
