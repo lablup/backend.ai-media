@@ -14,7 +14,6 @@ module.exports.Drawing = {
   },
 
   _canvas_map: {},
-  _obj_map: {},
   _patched_fabric: false,
   _animation_duration: 180,
   _delay_between_animations: 120,
@@ -192,6 +191,7 @@ module.exports.Drawing = {
       canvas_obj._sorna_anim = true;
       canvas_obj._group = false;
       canvas_obj._last_anim = [];
+      canvas_obj._obj_map = {};
       this._canvas_map[_id] = canvas_obj;
     } else {
       if (elem_created) {
@@ -218,14 +218,14 @@ module.exports.Drawing = {
     return canvas_obj;
   },
 
-  get_object: function(canvas_id, obj_id) {
-    var key = canvas_id + ':' + obj_id;
-    return this._obj_map[key] || null;
+  get_object: function(canvas, obj_id) {
+    var key = 'sorna:' + obj_id;
+    return canvas._obj_map[key] || null;
   },
 
-  register_object: function(canvas_id, obj_id, obj) {
-    var key = canvas_id + ':' + obj_id;
-    this._obj_map[key] = obj;
+  register_object: function(canvas, obj_id, obj) {
+    var key = 'sorna:' + obj_id;
+    canvas._obj_map[key] = obj;
   },
 
   hex2rgba: function(val) {
@@ -261,6 +261,7 @@ module.exports.Drawing = {
           canvas.setHeight(cmd[3]);
           canvas.setBackgroundColor(this.hex2rgba(cmd[4]));
           canvas.clear();
+          canvas._obj_map = {};
           canvas.lowerCanvasEl.style.height = 'auto';
           canvas._sorna_default_fgcolor = this.hex2rgba(cmd[5]);
           break;
@@ -281,7 +282,7 @@ module.exports.Drawing = {
         case 'obj':
           var obj_id = cmd[2];
           var args = cmd[3];
-          var obj = this.get_object(canvas_id, obj_id);
+          var obj = this.get_object(canvas, obj_id);
           if (obj == null) {
             // create
             switch (args[0]) {
@@ -394,14 +395,14 @@ module.exports.Drawing = {
             }
             if (obj) {
               obj._sorna_id = obj_id;
-              this.register_object(canvas_id, obj_id, obj);
+              this.register_object(canvas, obj_id, obj);
               canvas.add(obj);
             }
           }
           break;
         case 'update':
           var obj_id = cmd[2];
-          var obj = this.get_object(canvas_id, obj_id);
+          var obj = this.get_object(canvas, obj_id);
           if (obj == null)
             continue;
           var prop = cmd[3];
