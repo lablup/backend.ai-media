@@ -174,30 +174,45 @@ module.exports.Drawing = {
     var _id = 'sorna-canvas-' + canvas_id;
     var canvas_elem = document.getElementById(_id);
     var canvas_obj = this._canvas_map[_id];
+    var elem_created = false;
     if (!canvas_elem) {
       var outer_elem = document.createElement('div');
-      outer_elem.setAttribute('class', 'media-item media-drawing');
+      outer_elem.setAttribute('class', 'sorna-media-item sorna-media-drawing');
       outer_elem.style.cssText = 'text-align: center; margin: 5px;';
       canvas_elem = document.createElement('canvas');
       canvas_elem.id = _id;
       canvas_elem.style.cssText = 'margin: 0 auto; max-width: 100%; height: auto;';
       outer_elem.appendChild(canvas_elem);
       container.appendChild(outer_elem);
-      canvas_obj = null;
-      canvas_obj = new fabric.StaticCanvas(_id, {width: 0, height: 0});
+      elem_created = true;
+    }
+    if (!canvas_obj) {
+      canvas_obj = new fabric.StaticCanvas(canvas_elem, {width: 1, height: 1});
       canvas_obj.enableRetinaScaling = true;
       canvas_obj._sorna_anim = true;
       canvas_obj._group = false;
       canvas_obj._last_anim = [];
       this._canvas_map[_id] = canvas_obj;
     } else {
-      if (!canvas_obj) {
-        canvas_obj = new fabric.StaticCanvas(_id, {width: 0, height: 0});
-        canvas_obj.enableRetinaScaling = true;
-        canvas_obj._sorna_anim = true;
-        canvas_obj._group = false;
-        canvas_obj._last_anim = [];
-        this._canvas_map[_id] = canvas_obj;
+      if (elem_created) {
+        // The canvas element is destroyed and recreated.
+        // Thus, our fabric.StaticCanvas object has a dangling reference.
+        // Re-initialize it to use the newly created canvas element.
+        var w = canvas_obj.getWidth();
+        var h = canvas_obj.getHeight();
+        var bg = canvas_obj.backgroundColor;
+        // We perform some stuffs in fabric.StaticCanvas.prototype._initStatic
+        // on our own...
+        // The reason that we cannot call _initStatic() directly is because
+        // it clears the objects array which we want to keep intact.
+        canvas_obj._createLowerCanvas(canvas_elem)
+        canvas_obj._initOptions({
+          width: w, height: h, backgroundColor: bg
+        });
+        canvas_obj._initRetinaScaling();
+        canvas_obj.calcOffset();
+        canvas_obj.lowerCanvasEl.style.height = 'auto';
+        canvas_obj.renderAll();
       }
     }
     return canvas_obj;
@@ -471,19 +486,9 @@ module.exports.Drawing = {
             break;
           case 'rotate':
             if (canvas._sorna_anim) {
-              var opts = {
-                onComplete: function(_begin_val) {
-                  var new_val = _begin_val + val;
-                  if (new_val < -360)
-                    new_val += 360;
-                  if (new_val > 360)
-                    new_val -= 360;
-                  obj.set('angle', new_val);
-                }
-              };
               var ani = [
-                (val >= 0) ? this._create_anim(canvas, obj, 'angle', '+=' + val, opts)
-                           : this._create_anim(canvas, obj, 'angle', '-=' + Math.abs(val), opts)
+                (val >= 0) ? this._create_anim(canvas, obj, 'angle', '+=' + val)
+                           : this._create_anim(canvas, obj, 'angle', '-=' + Math.abs(val))
               ];
               if (canvas._group)
                 canvas._last_anim.push.apply(canvas._last_anim, ani);
