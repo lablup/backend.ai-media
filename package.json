@@ -2,6 +2,7 @@
   "devDependencies": {
     "fabric": ">=1.6.0",
     "msgpack-lite": ">=0.1.20",
-    "webpack": ">=1.13.1"
+    "webpack": ">=1.13.1",
+    "webpack-dashboard": ">=0.0.1"
   }
 }

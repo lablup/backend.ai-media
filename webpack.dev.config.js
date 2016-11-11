@@ -1,5 +1,9 @@
 var webpack = require("webpack");
 
+var Dashboard = require('webpack-dashboard');
+var DashboardPlugin = require('webpack-dashboard/plugin');
+var dashboard = new Dashboard();
+
 module.exports = {
   entry: ["./assets/js/main.js"],
   output: {
@@ -18,6 +22,7 @@ module.exports = {
   },
   plugins: [
     new webpack.optimize.UglifyJsPlugin({ compress: { warnings: false }}),
+    new DashboardPlugin(dashboard.setData),
   ]
 };
 
