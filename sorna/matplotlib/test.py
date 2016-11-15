@@ -1,9 +1,12 @@
-from six.moves import builtins
 import unittest
+
 import matplotlib
 matplotlib.use('module://sorna.matplotlib.backend_sorna')
 import matplotlib.pyplot as plt
+from six.moves import builtins
+
 from .backend_sorna import _backend
+
 
 class BackendReplacementTest(unittest.TestCase):
 
@@ -11,7 +14,7 @@ class BackendReplacementTest(unittest.TestCase):
 
         builtins._sorna_media = []
         # Example code taken from pyplot tutorial.
-        plt.plot([1,2,3,4])
+        plt.plot([1, 2, 3, 4])
         plt.ylabel('some numbers')
         plt.show()
         self.assertGreater(len(builtins._sorna_media), 0)
