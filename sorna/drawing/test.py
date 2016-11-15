@@ -3,7 +3,7 @@ import simplejson as json
 import unittest
 import math
 
-from . import canvas, Canvas, Vec2D, Turtle, Color, Colors
+from . import canvas, Canvas, Vec2D, Turtle, Colors
 from .encoding import encode_commands, decode_commands
 
 
@@ -65,16 +65,16 @@ class EncodingFunctionalTest(unittest.TestCase):
 
     def test_size(self):
         c = Canvas(100, 120)
-        l = c.line(20, 20, 50, 50)
-        b = c.circle(10, 10, 30)
+        _ = c.line(20, 20, 50, 50)
+        _ = c.circle(10, 10, 30)
         encdata = encode_commands(c._cmd_history)
         jsondata = json.dumps(c._cmd_history)
         self.assertGreater(len(jsondata), len(encdata))
 
     def test_encoding(self):
         c = Canvas(100, 120)
-        l = c.line(20, 20, 50, 50)
-        b = c.circle(10, 10, 30)
+        _ = c.line(20, 20, 50, 50)
+        _ = c.circle(10, 10, 30)
         encdata = encode_commands(c._cmd_history)
         cmds = decode_commands(encdata)
         self.assertListEqual(cmds[0], list(c._cmd_history[0]))
@@ -95,4 +95,3 @@ class TurtleFunctionalTest(unittest.TestCase):
         self.assertTupleEqual((10, 10), t.pos())
         t.setpos(Vec2D(50, 50))
         self.assertTupleEqual((50, 50), t.pos())
-

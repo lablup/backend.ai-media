@@ -1,5 +1,5 @@
 from six.moves import builtins
-from .encoding import encode_commands, decode_commands
+from .encoding import encode_commands
 from .turtle import Turtle
 from .color import Colors
 
