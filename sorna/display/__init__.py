@@ -14,7 +14,9 @@ from ..types import (
 def display(obj, **kwargs):
     if isinstance(obj, pd.DataFrame):
         builtins._sorna_emit(HTMLRecord(obj.to_html()))
+        return
     if isinstance(obj, np.ndarray):
         df = pd.DataFrame(obj, **kwargs)
         builtins._sorna_emit(HTMLRecord(df.to_html()))
+        return
     raise TypeError('Unsupported object type for display.')
