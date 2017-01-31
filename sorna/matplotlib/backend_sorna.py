@@ -19,6 +19,8 @@ from matplotlib.backends import backend_svg
 # My own imports
 from six.moves import builtins
 
+from ..types import MediaRecord
+
 
 def draw_if_interactive():
     pass
@@ -79,7 +81,7 @@ class FigureManagerSorna(FigureManagerBase):
                 self.canvas.print_png(buf)
                 raw = buf.getvalue()
             enc = base64.b64encode(raw)
-            builtins._sorna_media.append((
+            builtins._sorna_emit(MediaRecord(
                 'image/png',
                 'data:image/png;base64,' + enc.decode('ascii')
             ))
@@ -87,7 +89,7 @@ class FigureManagerSorna(FigureManagerBase):
             with io.BytesIO() as buf:
                 self.canvas.print_svg(buf)
                 raw = buf.getvalue()
-            builtins._sorna_media.append((
+            builtins._sorna_emit(MediaRecord(
                 'image/svg+xml',
                 raw.decode('utf8'),
             ))

@@ -1,4 +1,6 @@
 from six.moves import builtins
+
+from ..types import MediaRecord
 from .encoding import encode_commands
 from .turtle import Turtle
 from .color import Colors
@@ -83,7 +85,7 @@ class Canvas:
         self.fgcolor = fgcolor
 
     def update(self):
-        builtins._sorna_media.append((
+        builtins._sorna_emit(MediaRecord(
             u'application/x-sorna-drawing',
             encode_commands(self._cmd_history)
         ))

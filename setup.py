@@ -12,7 +12,7 @@ setup(
     # Versions should comply with PEP440.  For a discussion on single-sourcing
     # the version across setup.py and the project code, see
     # https://packaging.python.org/en/latest/single_source_version.html
-    version='0.2.0',
+    version='0.3.0dev',
     description='Sorna media supporting library',
     long_description='',
     url='https://github.com/lablup/sorna-draw',
@@ -36,7 +36,7 @@ setup(
         'Topic :: Software Development',
     ],
 
-    packages=['sorna.drawing', 'sorna.matplotlib'],
+    packages=['sorna', 'sorna.display', 'sorna.drawing', 'sorna.matplotlib'],
     namespace_packages=['sorna'],
 
     install_requires=[
@@ -44,6 +44,8 @@ setup(
         'simplejson',
         'namedlist',
         'u-msgpack-python',
+        'pandas',
+        'numpy',
         'matplotlib',
     ],
     extras_require={
