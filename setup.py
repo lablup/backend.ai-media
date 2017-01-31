@@ -12,10 +12,10 @@ setup(
     # Versions should comply with PEP440.  For a discussion on single-sourcing
     # the version across setup.py and the project code, see
     # https://packaging.python.org/en/latest/single_source_version.html
-    version='0.3.0dev',
+    version='0.3.0',
     description='Sorna media supporting library',
     long_description='',
-    url='https://github.com/lablup/sorna-draw',
+    url='https://github.com/lablup/sorna-media',
     author='Lablup Inc.',
     author_email='joongi@lablup.com',
     license='LGPLv3',
@@ -29,6 +29,7 @@ setup(
         'Programming Language :: Python :: 3',
         'Programming Language :: Python :: 3.4',
         'Programming Language :: Python :: 3.5',
+        'Programming Language :: Python :: 3.6',
         'Operating System :: POSIX',
         'Operating System :: MacOS :: MacOS X',
         'Environment :: No Input/Output (Daemon)',
