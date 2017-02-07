@@ -10,6 +10,8 @@ if (typeof(Sorna.assetRoot) == 'undefined') {
 __webpack_public_path__ = Sorna.assetRoot;
 __webpack_require__.p = Sorna.assetRoot + '/js/';
 
+import 'babel-polyfill';
+
 var fabric_loader = (resolve) => {
   require.ensure(['fabric'], function() {
     window.fabric = require('fabric').fabric;
@@ -19,7 +21,7 @@ var fabric_loader = (resolve) => {
 
 var drawing_loader = (resolve) => {
   require.ensure(['./drawing.js'], function() {
-    Sorna.Drawing = require('./drawing.js').Drawing;
+    Sorna.Drawing = require('./drawing.js').default;
     resolve();
   });
 };
@@ -27,15 +29,14 @@ var drawing_loader = (resolve) => {
 Sorna.loadWebterm = (resolve) => {
   if (typeof Sorna.Webterm == 'undefined') {
     require.ensure(['./webterm.js'], function() {
-      let mod = require('./webterm.js');
-      Sorna.Webterm = mod.default;
+      Sorna.Webterm = require('./webterm.js').default;
       resolve();
     });
   }
 };
 
-Sorna.Utils = {
-  async_series: (items, handler) => {
+class _Utils {
+  static async_series(items, handler) {
     let results = null;
     let items_copy = items.slice();
     return new Promise((resolve, reject) => {
@@ -54,21 +55,23 @@ Sorna.Utils = {
       next();
     });
   }
-};
+}
 
-Sorna.Media = {
-  _get_drawing_impl: function() {
+class _Media {
+  static _get_drawing_impl() {
     return {
       scripts: [
         {id:'js.common-fabric', loader:fabric_loader},
         {id:'js.sorna-drawing', loader:drawing_loader}
       ],
       handler: (result_id, type, data, container) => {
-        Sorna.Drawing.update(result_id, type, data, container);
+        let drawing = new Sorna.Drawing(result_id, container);
+        drawing.update(data);
       }
     };
-  },
-  _get_image_impl: function() {
+  }
+
+  static _get_image_impl() {
     return {
       scripts: [
       ],
@@ -88,8 +91,9 @@ Sorna.Media = {
         img_elem.src = data;
       }
     };
-  },
-  _get_svg_impl: () => {
+  }
+
+  static _get_svg_impl() {
     return {
       scripts: [
         //{id:'js.common-fabric', loader:fabric_loader}
@@ -110,8 +114,9 @@ Sorna.Media = {
         img_elem.src = 'data:image/svg+xml,' + encodeURIComponent(data);
       }
     };
-  },
-  _get_media_impls: () => {
+  }
+
+  static _get_media_impls() {
     let image_impl = this._get_image_impl();
     return {
       'application/x-sorna-drawing': this._get_drawing_impl(),
@@ -120,8 +125,9 @@ Sorna.Media = {
       'image/jpeg': image_impl,
       'image/gif': image_impl
     };
-  },
-  handle_all: (items, result_id, result_container) => {
+  }
+
+  static handle_all(items, result_id, result_container) {
     for (let i = 0; i < items.length; i++) {
       let media = items[i];
       let impl = this._get_media_impls()[media[0]];
@@ -138,6 +144,14 @@ Sorna.Media = {
       });
     }
   }
-};
+
+  static handleAll(items, result_id, result_container) {
+    this.handle_all(items, result_id, result_container);
+  }
+}
+
+Sorna.Utils = _Utils;
+Sorna.Media = _Media;
+
 
 /// vim: sts=2 sw=2 et
