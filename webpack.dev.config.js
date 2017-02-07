@@ -1,17 +1,24 @@
-var webpack = require("webpack");
+const webpack = require("webpack");
 
-var Dashboard = require('webpack-dashboard');
-var DashboardPlugin = require('webpack-dashboard/plugin');
-var dashboard = new Dashboard();
+const Dashboard = require('webpack-dashboard');
+const DashboardPlugin = require('webpack-dashboard/plugin');
+let dashboard = new Dashboard();
 
-module.exports = {
-  entry: ["./assets/js/main.js"],
+const config = {
+  entry: {
+    main: './assets/js/main.js',
+  },
   output: {
     path: "./assets/latest/js",
     publicPath: "/latest/js/",
     filename: "[name].min.js",
   },
-  devtool: '#eval-source-map',
+  module: {
+    loaders: [
+      { test: /\.js$/, exclude: /node_modules/, loader: "babel-loader" },
+    ],
+  },
+  devtool: 'inline-source-map',
   devServer: {
     port: 8002,
     // Turn off live-reloading to avoid conflicts with ZenDesk.
@@ -21,9 +28,14 @@ module.exports = {
     inline: false
   },
   plugins: [
-    new webpack.optimize.UglifyJsPlugin({ compress: { warnings: false }}),
+    new webpack.optimize.UglifyJsPlugin({
+      compress: { warnings: false },
+      sourceMap: true,
+    }),
     new DashboardPlugin(dashboard.setData),
   ]
 };
+
+module.exports = config;
 
 // vim: sts=2 sw=2 et

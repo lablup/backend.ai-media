@@ -1,8 +1,23 @@
 {
   "devDependencies": {
+    "babel-core": "^6.22.1",
+    "babel-loader": "^6.2.10",
+    "babel-preset-env": "^1.1.8",
     "fabric": ">=1.7.3",
     "msgpack-lite": ">=0.1.20",
-    "webpack": ">=1.14",
-    "webpack-dashboard": ">=0.2"
-  }
+    "sockjs-client": "^1.1.2",
+    "terminal.js": "^1.0.7",
+    "webpack": ">=2.2",
+    "webpack-dashboard": "^0.3.0"
+  },
+  "dependencies": {
+    "fabric": ">=1.7.3",
+    "msgpack-lite": ">=0.1.20"
+  },
+  "name": "sorna-media",
+  "version": "0.9.0",
+  "main": "assets/js/main.js",
+  "repository": "git@github.com:lablup/sorna-media.git",
+  "author": "Joongi Kim <joongi@lablup.com>",
+  "license": "BSD-3-Clause"
 }

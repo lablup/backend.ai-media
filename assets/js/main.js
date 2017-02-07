@@ -2,7 +2,7 @@
 
 /** Sorna Media Handlers. */
 
-window.Sorna = window.Sorna || { version: '0.2.0' };
+window.Sorna = window.Sorna || { version: '0.9.0' };
 if (typeof(Sorna.assetRoot) == 'undefined') {
   // Fallback to the current host address
   Sorna.assetRoot = window.location.protocol + '//' + window.location.host;
@@ -10,32 +10,42 @@ if (typeof(Sorna.assetRoot) == 'undefined') {
 __webpack_public_path__ = Sorna.assetRoot;
 __webpack_require__.p = Sorna.assetRoot + '/js/';
 
-var fabric_loader = function(resolve) {
+var fabric_loader = (resolve) => {
   require.ensure(['fabric'], function() {
     window.fabric = require('fabric').fabric;
     resolve();
   });
 };
 
-var drawing_loader = function(resolve) {
+var drawing_loader = (resolve) => {
   require.ensure(['./drawing.js'], function() {
     Sorna.Drawing = require('./drawing.js').Drawing;
     resolve();
   });
 };
 
+Sorna.loadWebterm = (resolve) => {
+  if (typeof Sorna.Webterm == 'undefined') {
+    require.ensure(['./webterm.js'], function() {
+      let mod = require('./webterm.js');
+      Sorna.Webterm = mod.default;
+      resolve();
+    });
+  }
+};
+
 Sorna.Utils = {
-  async_series: function(items, handler) {
-    var results = null;
-    var items_copy = items.slice();
-    return new Promise(function(resolve, reject) {
+  async_series: (items, handler) => {
+    let results = null;
+    let items_copy = items.slice();
+    return new Promise((resolve, reject) => {
       function next(result) {
         if (!results)
           results = [];
         else
           results.push(result);
         if (items_copy.length > 0) {
-          var item = items_copy.shift();
+          let item = items_copy.shift();
           handler(item).then(next).catch(reject);
         } else {
           resolve(results);
@@ -53,7 +63,7 @@ Sorna.Media = {
         {id:'js.common-fabric', loader:fabric_loader},
         {id:'js.sorna-drawing', loader:drawing_loader}
       ],
-      handler: function(result_id, type, data, container) {
+      handler: (result_id, type, data, container) => {
         Sorna.Drawing.update(result_id, type, data, container);
       }
     };
@@ -62,10 +72,10 @@ Sorna.Media = {
     return {
       scripts: [
       ],
-      handler: function(result_id, type, data, container) {
-        var img_elem = document.getElementById(result_id);
+      handler: (result_id, type, data, container) => {
+        let img_elem = document.getElementById(result_id);
         if (!img_elem) {
-          var outer_elem = document.createElement('div');
+          let outer_elem = document.createElement('div');
           outer_elem.setAttribute('class', 'media-item media-image');
           outer_elem.style.cssText = 'text-align: center; margin: 5px;';
           img_elem = document.createElement('img');
@@ -79,15 +89,15 @@ Sorna.Media = {
       }
     };
   },
-  _get_svg_impl: function() {
+  _get_svg_impl: () => {
     return {
       scripts: [
         //{id:'js.common-fabric', loader:fabric_loader}
       ],
-      handler: function(result_id, type, data, container) {
-        var img_elem = document.getElementById(result_id);
+      handler: (result_id, type, data, container) => {
+        let img_elem = document.getElementById(result_id);
         if (!img_elem) {
-          var outer_elem = document.createElement('div');
+          let outer_elem = document.createElement('div');
           outer_elem.setAttribute('class', 'media-item media-image');
           outer_elem.style.cssText = 'text-align: center; margin: 5px;';
           img_elem = document.createElement('img');
@@ -101,8 +111,8 @@ Sorna.Media = {
       }
     };
   },
-  _get_media_impls: function() {
-    var image_impl = this._get_image_impl();
+  _get_media_impls: () => {
+    let image_impl = this._get_image_impl();
     return {
       'application/x-sorna-drawing': this._get_drawing_impl(),
       'image/svg+xml': this._get_svg_impl(),
@@ -111,19 +121,19 @@ Sorna.Media = {
       'image/gif': image_impl
     };
   },
-  handle_all: function(items, result_id, result_container) {
-    for (var i = 0; i < items.length; i++) {
-      var media = items[i];
-      var impl = this._get_media_impls()[media[0]];
+  handle_all: (items, result_id, result_container) => {
+    for (let i = 0; i < items.length; i++) {
+      let media = items[i];
+      let impl = this._get_media_impls()[media[0]];
       if (impl == undefined)
         continue;
-      var script_promises = [];
-      for (var j = 0; j < impl.scripts.length; j++) {
-        script_promises.push(new Promise(function(resolve, reject) {
+      let script_promises = [];
+      for (let j = 0; j < impl.scripts.length; j++) {
+        script_promises.push(new Promise((resolve, reject) => {
           impl.scripts[j].loader(resolve);
         }));
       }
-      Promise.all(script_promises).then(function() {
+      Promise.all(script_promises).then(() => {
         impl.handler(result_id + '-' + i, media[0], media[1], result_container);
       });
     }

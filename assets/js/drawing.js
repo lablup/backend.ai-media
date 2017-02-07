@@ -2,7 +2,7 @@
 
 /* Sorna Simplified Drawing API for HTML5 Canvas. */
 
-var msgpack = require('msgpack-lite');
+import msgpack from 'msgpack-lite';
 
 module.exports.Drawing = {
   decode_commands: function(data) {
