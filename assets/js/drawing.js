@@ -194,7 +194,7 @@ class Drawing {
     if (canvas_elem === null) {
       var outer_elem = document.createElement('div');
       outer_elem.setAttribute('class', 'sorna-media-item sorna-media-drawing');
-      outer_elem.style.cssText = 'text-align: center; margin: 5px;';
+      outer_elem.style.cssText = 'text-align: center; margin: 10px; padding: 0; line-height: 1.0;';
       canvas_elem = document.createElement('canvas');
       canvas_elem.id = _id;
       canvas_elem.style.cssText = 'margin: 0 auto; max-width: 100%; height: auto;';
@@ -223,10 +223,9 @@ class Drawing {
         // The reason that we cannot call _initStatic() directly is because
         // it clears the objects array which we want to keep intact.
         canvas_obj._createLowerCanvas(canvas_elem)
-        canvas_obj._initOptions({
-          width: w, height: h, backgroundColor: bg
-        });
+        canvas_obj._initOptions({ width: w, height: h });
         canvas_obj._initRetinaScaling();
+        canvas_obj.setBackgroundColor(bg);
         canvas_obj.calcOffset();
         canvas_obj.lowerCanvasEl.style.height = 'auto';
         canvas_obj.renderAll();
@@ -273,10 +272,10 @@ class Drawing {
         case 'canvas':
           canvas.setWidth(cmd[2]);
           canvas.setHeight(cmd[3]);
-          canvas.setBackgroundColor(hex2rgba(cmd[4]));
           canvas.clear();
           canvas._obj_map = new Map;
           canvas.lowerCanvasEl.style.height = 'auto';
+          canvas.setBackgroundColor(hex2rgba(cmd[4]));
           canvas._sorna_default_fgcolor = hex2rgba(cmd[5]);
           break;
         case 'stop-anim':
@@ -511,7 +510,7 @@ class Drawing {
               else
                 anim_chain.push(ani);
             } else {
-              var cur = obj.get('angle');
+              let cur = obj.get('angle');
               obj.set('angle', cur + val);
             }
             break;
