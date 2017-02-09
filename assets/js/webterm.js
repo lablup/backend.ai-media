@@ -164,10 +164,13 @@ class Webterm {
     this.writable.write('\x0c');
   }
 
-  resizeToFit(elem) {
+  resizeToFit(elem, opts) {
     if (typeof elem == 'undefined') {
       elem = this.container;
     }
+    opts = opts || {};
+    opts.maxRows = ('maxRows' in opts) ? opts.maxRows : 0;
+    opts.maxCols = ('maxCols' in opts) ? opts.maxCols : 0;
     let targetWidth = elem.offsetWidth;
     let targetHeight = elem.offsetHeight;
     let tempText = document.createElement('div');
@@ -189,7 +192,10 @@ class Webterm {
     tempText.remove();
     let numRows = parseInt(targetHeight / charHeight) - 2;
     let numCols = parseInt(targetWidth / charWidth) - 2;
-    numCols = 80; // FIXME
+    if (opts.maxRows > 0)
+      numRows = Math.min(numRows, opts.maxRows);
+    if (opts.maxCols > 0)
+      numCols = Math.min(numCols, opts.maxCols);
 
     console.log('resize to ' + numRows + ' rows and ' + numCols + ' cols.');
     this.term.state.resize({rows: numRows, columns: numCols});
