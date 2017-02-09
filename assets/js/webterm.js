@@ -2,6 +2,25 @@
 
 const Terminal = require('terminal.js');
 const SockJS = require('sockjs-client');
+const Writable = require('stream').Writable;
+
+class SocketWritable extends Writable {
+  constructor(sessId, sock) {
+    super();
+    this._sessId = sessId;
+    this._sock = sock;
+  }
+
+  write(chunk, encoding, cb) {
+    let msg = JSON.stringify({
+      "sid": this._sessId,
+      "type": "stdin",
+      "chars": btoa(chunk),
+    });
+    this._sock.send(msg);
+    if (cb) cb();
+  }
+}
 
 class Webterm {
   constructor(container, sessionId) {
@@ -47,33 +66,8 @@ class Webterm {
                 + (location.port ? (":" + location.port) : "")  + "/ws?lang=git";
       this._sock = new SockJS(url);
 
-      let writable = {};
-      writable.removeListener = () => { };
-      writable.on = (type, handler) => {
-        this.streamOnHandlers[type] = handler;
-      };
-      writable.once = (type, handler) => {
-        this.streamOnceHandlers[type] = handler;
-      };
-      writable.emit = (ev) => {
-        let args = [];
-        Array.prototype.push.apply(args, arguments);
-        args.shift();
-        if (this.streamOnHandlers[ev])
-          this.streamOnHandlers[ev].apply(writable, args);
-      };
-      writable.write = (data) => {
-        if (this._connected) {
-          let msg = JSON.stringify({
-            "sid": this.sessId,
-            "type": "stdin",
-            "chars": btoa(data),
-          });
-          this._sock.send(msg);
-        }
-      };
-      this.writable = writable;
-      this.term.dom(this.container).pipe(writable);
+      this.writable = new SocketWritable(this.sessId, this._sock);
+      this.term.dom(this.container).pipe(this.writable);
 
       let is_settled = false;
 
@@ -196,8 +190,6 @@ class Webterm {
       numRows = Math.min(numRows, opts.maxRows);
     if (opts.maxCols > 0)
       numCols = Math.min(numCols, opts.maxCols);
-
-    console.log('resize to ' + numRows + ' rows and ' + numCols + ' cols.');
     this.term.state.resize({rows: numRows, columns: numCols});
     if (this._connected) {
       this._sock.send(JSON.stringify({
