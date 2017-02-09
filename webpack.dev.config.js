@@ -16,7 +16,11 @@ const config = {
   module: {
     loaders: [
       { test: /\.js$/, exclude: /node_modules/, loader: "babel-loader" },
+      { test: /\.tsx?$/, loader: "ts-loader" },
     ],
+  },
+  resolve: {
+    extensions: ['', '.webpack.js', '.web.js', '.ts', '.tsx', '.js'],
   },
   devtool: 'inline-source-map',
   devServer: {

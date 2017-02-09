@@ -7,9 +7,11 @@
     "fabric": ">=1.7.3",
     "msgpack-lite": ">=0.1.20",
     "sockjs-client": "^1.1.2",
-    "terminal.js": "^1.0.7",
+    "ts-loader": "^2.0.0",
+    "typescript": "^2.1.6",
     "webpack": ">=2.2",
-    "webpack-dashboard": "^0.3.0"
+    "webpack-dashboard": "^0.3.0",
+    "xterm": "^2.3.1"
   },
   "dependencies": {
     "fabric": ">=1.7.3",

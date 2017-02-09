@@ -1,8 +1,23 @@
 'use strict';
 
-const Terminal = require('terminal.js');
+const Terminal = require('xterm');
 const SockJS = require('sockjs-client');
 const Writable = require('stream').Writable;
+
+function b64EncodeUnicode(str) {
+  return window.btoa(unescape(encodeURIComponent( str )));
+  //return btoa(encodeURIComponent(str).replace(/%([0-9A-F]{2})/g, function(match, p1) {
+  //  return String.fromCharCode('0x' + p1);
+  //}));
+}
+
+function b64DecodeUnicode(str) {
+  return decodeURIComponent(escape(window.atob( str )));
+  //return decodeURIComponent(Array.prototype.map.call(atob(str), function(c) {
+  //  return '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2);
+  //}).join(''));
+}
+
 
 class SocketWritable extends Writable {
   constructor(sessId, sock) {
@@ -15,7 +30,7 @@ class SocketWritable extends Writable {
     let msg = JSON.stringify({
       "sid": this._sessId,
       "type": "stdin",
-      "chars": btoa(chunk),
+      "chars": b64EncodeUnicode(chunk),
     });
     this._sock.send(msg);
     if (cb) cb();
@@ -58,8 +73,9 @@ class Webterm {
         return;
       }
 
-      this.term = new Terminal(this.container);
-      this.term.state.reset();
+      this.term = new Terminal();
+      this.term.open(this.container);
+      this.term.reset();
       this.term.write("Loading your terminal...\r\n");
 
       let url = "//" + document.domain
@@ -67,7 +83,9 @@ class Webterm {
       this._sock = new SockJS(url);
 
       this.writable = new SocketWritable(this.sessId, this._sock);
-      this.term.dom(this.container).pipe(this.writable);
+      this.term.on('data', (data) => {
+        this.writable.write(data);
+      });
 
       let is_settled = false;
 
@@ -104,7 +122,7 @@ class Webterm {
         let data = JSON.parse(e.data);
         switch (data.type) {
         case "out":
-          this.term.write(atob(data.data));
+          this.term.write(b64DecodeUnicode(data.data));
           break;
         case "error":
           this.term.write('\r\n\x1b[37;41;1m Ooops, we got a server error! \x1b[0;31m\r\n' + data.reason + '\x1b[0m\r\n');
@@ -190,7 +208,7 @@ class Webterm {
       numRows = Math.min(numRows, opts.maxRows);
     if (opts.maxCols > 0)
       numCols = Math.min(numCols, opts.maxCols);
-    this.term.state.resize({rows: numRows, columns: numCols});
+    this.term.resize(numCols, numRows);
     if (this._connected) {
       this._sock.send(JSON.stringify({
         "sid": this.sessId,
