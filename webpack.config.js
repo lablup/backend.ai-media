@@ -1,22 +1,33 @@
 const webpack = require("webpack");
+const path = require('path')
 
 const config = {
   entry: {
     main: './assets/js/main.js',
   },
   output: {
-    path: "./assets/[hash]/js",
+    path: path.resolve(__dirname, "./assets/[hash]/js"),
     publicPath: "/[hash]/js/",
     filename: "[name].min.js",
   },
   module: {
-    loaders: [
-      { test: /\.js$/, exclude: /node_modules/, loader: "babel-loader" },
-      { test: /\.tsx?$/, loader: "ts-loader" },
+    rules: [
+      {
+        test: /\.js$/,
+        exclude: /node_modules/,
+        loader: "babel-loader",
+      },
+      {
+        test: /\.tsx?$/,
+        loader: "ts-loader",
+      },
+      {
+        test: /\.css$/,
+        use: [
+          { loader: "css-loader" },
+        ]
+      },
     ],
-  },
-  resolve: {
-    extensions: ['', '.webpack.js', '.web.js', '.ts', '.tsx', '.js'],
   },
   devtool: 'hidden-source-map',
   plugins: [

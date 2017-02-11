@@ -4,6 +4,8 @@ const Terminal = require('xterm');
 const SockJS = require('sockjs-client');
 const Writable = require('stream').Writable;
 
+require("!!style-loader!css-loader!../vendor/xterm/xterm.css");
+
 function b64EncodeUnicode(str) {
   return window.btoa(unescape(encodeURIComponent( str )));
   //return btoa(encodeURIComponent(str).replace(/%([0-9A-F]{2})/g, function(match, p1) {
@@ -12,10 +14,14 @@ function b64EncodeUnicode(str) {
 }
 
 function b64DecodeUnicode(str) {
-  return decodeURIComponent(escape(window.atob( str )));
-  //return decodeURIComponent(Array.prototype.map.call(atob(str), function(c) {
-  //  return '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2);
-  //}).join(''));
+  try {
+    return decodeURIComponent(escape(window.atob( str )));
+    //return decodeURIComponent(Array.prototype.map.call(atob(str), function(c) {
+    //  return '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2);
+    //}).join(''));
+  } catch (e) {
+    // do nothing
+  }
 }
 
 
@@ -27,6 +33,8 @@ class SocketWritable extends Writable {
   }
 
   write(chunk, encoding, cb) {
+    if (this._sock === null)
+      return;
     let msg = JSON.stringify({
       "sid": this._sessId,
       "type": "stdin",
@@ -42,13 +50,10 @@ class Webterm {
     this.container = container;
     this.term = null;
     this.pinger = null;
-    this.backoff = 0;
     this.sessId = sessionId;
     this._sock = null;
     this._connecting = false;
     this._connected = false;
-    this.streamOnHandlers = {};
-    this.streamOnceHandlers = {};
     this.writable = null;
     this.restartLoadingTick = null;
   }
@@ -73,8 +78,12 @@ class Webterm {
         return;
       }
 
-      this.term = new Terminal();
-      this.term.open(this.container);
+      let created = false;
+      if (this.term === null) {
+        this.term = new Terminal();
+        this.term.open(this.container);
+        created = true;
+      }
       this.term.reset();
       this.term.write("Loading your terminal...\r\n");
 
@@ -82,10 +91,13 @@ class Webterm {
                 + (location.port ? (":" + location.port) : "")  + "/ws?lang=git";
       this._sock = new SockJS(url);
 
+      // TODO: remove existing handlers
       this.writable = new SocketWritable(this.sessId, this._sock);
-      this.term.on('data', (data) => {
-        this.writable.write(data);
-      });
+      if (created) {
+        this.term.on('data', (data) => {
+          this.writable.write(data);
+        });
+      }
 
       let is_settled = false;
 

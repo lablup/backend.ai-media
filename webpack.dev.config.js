@@ -1,4 +1,5 @@
 const webpack = require("webpack");
+const path = require('path')
 
 const Dashboard = require('webpack-dashboard');
 const DashboardPlugin = require('webpack-dashboard/plugin');
@@ -9,18 +10,28 @@ const config = {
     main: './assets/js/main.js',
   },
   output: {
-    path: "./assets/latest/js",
+    path: path.resolve(__dirname, "assets/latest/js"),
     publicPath: "/latest/js/",
     filename: "[name].min.js",
   },
   module: {
-    loaders: [
-      { test: /\.js$/, exclude: /node_modules/, loader: "babel-loader" },
-      { test: /\.tsx?$/, loader: "ts-loader" },
+    rules: [
+      {
+        test: /\.js$/,
+        exclude: /node_modules/,
+        loader: "babel-loader",
+      },
+      {
+        test: /\.tsx?$/,
+        loader: "ts-loader",
+      },
+      {
+        test: /\.css$/,
+        use: [
+          { loader: "css-loader" },
+        ]
+      },
     ],
-  },
-  resolve: {
-    extensions: ['', '.webpack.js', '.web.js', '.ts', '.tsx', '.js'],
   },
   devtool: 'inline-source-map',
   devServer: {
@@ -29,7 +40,8 @@ const config = {
     // See https://github.com/webpack/webpack-dev-server/issues/117
     // (Auto-recompiling aka watch mode still works)
     hot: false,
-    inline: false
+    inline: false,
+    quiet: true,
   },
   plugins: [
     new webpack.optimize.UglifyJsPlugin({

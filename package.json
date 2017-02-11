@@ -1,26 +1,30 @@
 {
-  "devDependencies": {
-    "babel-core": "^6.22.1",
-    "babel-loader": "^6.2.10",
-    "babel-polyfill": "^6.22.0",
-    "babel-preset-env": "^1.1.8",
-    "fabric": ">=1.7.3",
-    "msgpack-lite": ">=0.1.20",
-    "sockjs-client": "^1.1.2",
-    "ts-loader": "^2.0.0",
-    "typescript": "^2.1.6",
-    "webpack": ">=2.2",
-    "webpack-dashboard": "^0.3.0",
-    "xterm": "^2.3.1"
-  },
-  "dependencies": {
-    "fabric": ">=1.7.3",
-    "msgpack-lite": ">=0.1.20"
-  },
   "name": "sorna-media",
   "version": "0.9.0",
   "main": "assets/js/main.js",
   "repository": "git@github.com:lablup/sorna-media.git",
   "author": "Joongi Kim <joongi@lablup.com>",
-  "license": "BSD-3-Clause"
+  "license": "BSD-3-Clause",
+  "devDependencies": {
+    "babel-core": "^6.22.1",
+    "babel-loader": "^6.2.10",
+    "babel-polyfill": "^6.22.0",
+    "babel-preset-env": "^1.1.8",
+    "css-loader": "^0.26.1",
+    "fabric": ">=1.7.3",
+    "msgpack-lite": ">=0.1.20",
+    "sockjs-client": "^1.1.2",
+    "style-loader": "^0.13.1",
+    "ts-loader": "^2.0.0",
+    "typescript": "^2.1.6",
+    "webpack": "^2.2.1",
+    "webpack-dashboard": "^0.3.0",
+    "webpack-dev-server": "^2.3.0",
+    "xterm": "^2.3.1"
+  },
+  "dependencies": {},
+  "scripts": {
+    "devserver": "webpack-dev-server --config webpack.dev.config.js",
+    "build": "update.sh"
+  }
 }

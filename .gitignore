@@ -68,3 +68,4 @@ target/
 
 # npm/webpack
 node_modules
+assets/latest

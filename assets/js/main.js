@@ -3,14 +3,14 @@
 /** Sorna Media Handlers. */
 
 window.Sorna = window.Sorna || { version: '0.9.0' };
-if (typeof(Sorna.assetRoot) == 'undefined') {
+if (Sorna.assetRoot === undefined) {
   // Fallback to the current host address
   Sorna.assetRoot = window.location.protocol + '//' + window.location.host;
 }
 __webpack_public_path__ = Sorna.assetRoot;
 __webpack_require__.p = Sorna.assetRoot + '/js/';
 
-import 'babel-polyfill';
+require('babel-polyfill');
 
 var fabric_loader = (resolve) => {
   require.ensure(['fabric'], function() {
@@ -27,13 +27,13 @@ var drawing_loader = (resolve) => {
 };
 
 Sorna.loadWebterm = (resolve) => {
-  if (typeof Sorna.Webterm == 'undefined') {
+  if (Sorna.Webterm === undefined) {
     require.ensure(['./webterm.js'], function() {
       Sorna.Webterm = require('./webterm.js').default;
       resolve();
     });
-  }
-  // TODO: inject CSS from Sorna.assetRoot
+  } else
+    resolve();
 };
 
 class _Utils {
@@ -132,7 +132,7 @@ class _Media {
     for (let i = 0; i < items.length; i++) {
       let media = items[i];
       let impl = this._get_media_impls()[media[0]];
-      if (impl == undefined)
+      if (impl === undefined)
         continue;
       let script_promises = [];
       for (let j = 0; j < impl.scripts.length; j++) {
