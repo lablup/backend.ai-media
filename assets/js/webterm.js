@@ -143,8 +143,6 @@ class Webterm {
       };
 
       this._sock.onerror = (e) => {
-        if (this.streamOnHandlers["error"])
-          this.streamOnHandlers["error"].apply(writable);
         if (!is_settled) {
           is_settled = true;
           this._connecting = false;
@@ -156,12 +154,6 @@ class Webterm {
       this._sock.onclose = (e) => {
         this._connecting = false;
         this._connected = false;
-        if (this.streamOnHandlers["close"])
-          this.streamOnHandlers["close"].apply(writable);
-        if (this.streamOnceHandlers["close"]) {
-          this.streamOnceHandlers["close"].apply(writable);
-          this.streamOnceHandlers["close"] = undefined;
-        }
         if (!is_settled) {
           is_settled = true;
           reject('connection failure');
