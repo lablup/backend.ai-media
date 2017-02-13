@@ -158,8 +158,6 @@ exports.CHARSETS['='] = {
     '~': 'û'
 };
 
-
-
 },{}],2:[function(require,module,exports){
 "use strict";
 var CompositionHelper = (function () {
@@ -284,8 +282,6 @@ var CompositionHelper = (function () {
 }());
 exports.CompositionHelper = CompositionHelper;
 
-
-
 },{}],3:[function(require,module,exports){
 "use strict";
 var C0;
@@ -326,8 +322,6 @@ var C0;
     C0.DEL = '\x7f';
 })(C0 = exports.C0 || (exports.C0 = {}));
 ;
-
-
 
 },{}],4:[function(require,module,exports){
 "use strict";
@@ -383,8 +377,6 @@ var EventEmitter = (function () {
     return EventEmitter;
 }());
 exports.EventEmitter = EventEmitter;
-
-
 
 },{}],5:[function(require,module,exports){
 "use strict";
@@ -1310,8 +1302,6 @@ var wcwidth = (function (opts) {
     return wcwidth;
 })({ nul: 0, control: 0 });
 
-
-
 },{"./Charsets":1,"./EscapeSequences":3}],6:[function(require,module,exports){
 "use strict";
 var EscapeSequences_1 = require("./EscapeSequences");
@@ -1785,8 +1775,6 @@ var Parser = (function () {
 }());
 exports.Parser = Parser;
 
-
-
 },{"./Charsets":1,"./EscapeSequences":3}],7:[function(require,module,exports){
 "use strict";
 var MAX_REFRESH_FRAME_SKIP = 5;
@@ -1996,8 +1984,6 @@ function checkBoldBroken(document) {
     return w1 !== w2;
 }
 
-
-
 },{}],8:[function(require,module,exports){
 "use strict";
 var Viewport = (function () {
@@ -2071,8 +2057,6 @@ var Viewport = (function () {
     return Viewport;
 }());
 exports.Viewport = Viewport;
-
-
 
 },{}],9:[function(require,module,exports){
 "use strict";
@@ -2153,8 +2137,6 @@ function rightClickHandler(ev, term) {
 }
 exports.rightClickHandler = rightClickHandler;
 
-
-
 },{}],10:[function(require,module,exports){
 "use strict";
 var Generic_1 = require("./Generic");
@@ -2168,12 +2150,12 @@ exports.isIpad = platform === 'iPad';
 exports.isIphone = platform === 'iPhone';
 exports.isMSWindows = Generic_1.contains(['Windows', 'Win16', 'Win32', 'WinCE'], platform);
 
-
-
 },{"./Generic":13}],11:[function(require,module,exports){
 "use strict";
 var __extends = (this && this.__extends) || function (d, b) {
-    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
+    for (var p in b)
+        if (b.hasOwnProperty(p))
+            d[p] = b[p];
     function __() { this.constructor = d; }
     d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
 };
@@ -2228,8 +2210,6 @@ var CharMeasure = (function (_super) {
     return CharMeasure;
 }(EventEmitter_js_1.EventEmitter));
 exports.CharMeasure = CharMeasure;
-
-
 
 },{"../EventEmitter.js":4}],12:[function(require,module,exports){
 "use strict";
@@ -2367,8 +2347,6 @@ var CircularList = (function () {
 }());
 exports.CircularList = CircularList;
 
-
-
 },{}],13:[function(require,module,exports){
 "use strict";
 function contains(arr, el) {
@@ -2376,8 +2354,6 @@ function contains(arr, el) {
 }
 exports.contains = contains;
 ;
-
-
 
 },{}],14:[function(require,module,exports){
 "use strict";
@@ -2559,8 +2535,6 @@ Terminal.vcolors = (function () {
     }
     return out;
 })();
-Terminal.isSafari = /constructor/i.test(window.HTMLElement)
-    || (function (p) { return p.toString() === "[object SafariRemoteNotification]"; })(!window['safari'] || safari.pushNotification);
 Terminal.defaults = {
     colors: Terminal.colors,
     theme: 'default',
@@ -2708,10 +2682,9 @@ Terminal.bindKeys = function (term) {
     on(term.textarea, 'keydown', function (ev) {
         term.keyDown(ev);
     }, true);
-    var keyPressEventName = (Terminal.isSafari) ? 'textInput' : 'keypress';
-    on(term.textarea, keyPressEventName, function (ev) {
+    on(term.textarea, 'keypress', function (ev) {
         term.keyPress(ev);
-        term.textarea.value = '';
+        this.value = '';
     }, true);
     on(term.textarea, 'compositionstart', term.compositionHelper.compositionstart.bind(term.compositionHelper));
     on(term.textarea, 'compositionupdate', term.compositionHelper.compositionupdate.bind(term.compositionHelper));
@@ -3492,27 +3465,22 @@ Terminal.prototype.setgCharset = function (g, charset) {
 Terminal.prototype.keyPress = function (ev) {
     var key;
     this.cancel(ev);
-    if ((ev.altKey || ev.ctrlKey || ev.metaKey) && !isThirdLevelShift(this, ev)) {
-        return false;
+    if (ev.charCode) {
+        key = ev.charCode;
     }
-    if (Terminal.isSafari) {
-        key = ev.data;
+    else if (ev.which == null) {
+        key = ev.keyCode;
+    }
+    else if (ev.which !== 0 && ev.charCode !== 0) {
+        key = ev.which;
     }
     else {
-        if (ev.charCode) {
-            key = ev.charCode;
-        }
-        else if (ev.which == null) {
-            key = ev.keyCode;
-        }
-        else if (ev.which !== 0 && ev.charCode !== 0) {
-            key = ev.which;
-        }
-        else {
-            return false;
-        }
-        key = String.fromCharCode(key);
+        return false;
     }
+    if (!key || ((ev.altKey || ev.ctrlKey || ev.metaKey) && !isThirdLevelShift(this, ev))) {
+        return false;
+    }
+    key = String.fromCharCode(key);
     this.emit('keypress', key, ev);
     this.emit('key', key, ev);
     this.showCursor();
@@ -3896,8 +3864,6 @@ Terminal.on = on;
 Terminal.off = off;
 Terminal.cancel = cancel;
 module.exports = Terminal;
-
-
 
 },{"./CompositionHelper":2,"./EscapeSequences":3,"./EventEmitter":4,"./InputHandler":5,"./Parser":6,"./Renderer":7,"./Viewport":8,"./handlers/Clipboard":9,"./utils/Browser":10,"./utils/CharMeasure":11,"./utils/CircularList":12}]},{},[14])(14)
 });
