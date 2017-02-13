@@ -33,9 +33,17 @@ const config = {
       },
     ],
   },
+  resolve: {
+    alias: {
+      'fabric': '../vendor/fabric/fabric.js',
+      'xterm': '../vendor/xterm/xterm.js',
+    },
+    extensions: ['.json', '.js', '.ts', '.tsx', '.css'],
+  },
   devtool: 'inline-source-map',
   devServer: {
     port: 8002,
+    host: '0.0.0.0',
     // Turn off live-reloading to avoid conflicts with ZenDesk.
     // See https://github.com/webpack/webpack-dev-server/issues/117
     // (Auto-recompiling aka watch mode still works)

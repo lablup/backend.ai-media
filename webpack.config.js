@@ -29,6 +29,13 @@ const config = {
       },
     ],
   },
+  resolve: {
+    alias: {
+      'fabric': '../vendor/fabric/fabric.js',
+      'xterm': '../vendor/xterm/xterm.js',
+    },
+    extensions: ['.json', '.js', '.ts', '.tsx', '.css'],
+  },
   devtool: 'hidden-source-map',
   plugins: [
     new webpack.optimize.UglifyJsPlugin({

@@ -11,7 +11,6 @@
     "babel-polyfill": "^6.22.0",
     "babel-preset-env": "^1.1.8",
     "css-loader": "^0.26.1",
-    "fabric": ">=1.7.3",
     "msgpack-lite": ">=0.1.20",
     "sockjs-client": "^1.1.2",
     "style-loader": "^0.13.1",
@@ -19,12 +18,12 @@
     "typescript": "^2.1.6",
     "webpack": "^2.2.1",
     "webpack-dashboard": "^0.3.0",
-    "webpack-dev-server": "^2.3.0",
-    "xterm": "^2.3.1"
+    "webpack-dev-server": "^2.3.0"
   },
   "dependencies": {},
   "scripts": {
     "devserver": "webpack-dev-server --config webpack.dev.config.js",
-    "build": "update.sh"
+    "update": "./update.sh",
+    "build": "webpack"
   }
 }
