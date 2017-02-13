@@ -91,7 +91,7 @@ do not use "hot module refresh" (HMR) due to conflicts with script tags without
 src attributes (e.g., ZenDesk-injected scripts).
 
 ```sh
-$ webpack-dev-server --config webpack.dev.config.js
+$ yarn run devserver
 # Bundled scripts are served at http://127.0.0.1:8002/latest/js/...
 ```
 
@@ -106,7 +106,8 @@ the secret key to make it working.
 Before uploading, we first need to compile the resources for production.
 
 ```sh
-$ ./update.sh
+$ yarn run update
+# This includes "yarn run build" process.
 ```
 
 This script will write the compiled resources into `assets/<hash>` directory,
