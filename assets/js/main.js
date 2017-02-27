@@ -100,13 +100,14 @@ class _Media {
         //{id:'js.common-fabric', loader:fabric_loader}
       ],
       handler: (result_id, type, data, container) => {
-        let img_elem = document.getElementById(result_id);
+        let img_id = result_id + '-svg';
+        let img_elem = document.getElementById(img_id);
         if (!img_elem) {
           let outer_elem = document.createElement('div');
           outer_elem.setAttribute('class', 'media-item media-image');
           outer_elem.style.cssText = 'text-align: center; margin: 5px;';
           img_elem = document.createElement('img');
-          img_elem.id = result_id;
+          img_elem.id = img_id;
           img_elem.style.cssText = 'margin: 0 auto; max-width: 100%; height: auto;';
           img_elem.alt = 'generated image';
           outer_elem.appendChild(img_elem);
@@ -128,21 +129,33 @@ class _Media {
     };
   }
 
+  static handle(item, result_id, result_container) {
+    let media_type, media_data;
+    if (Array.isArray(item)) {
+      media_type = item[0];
+      media_data = item[1];
+    } else {
+      media_type = item.type;
+      media_data = item.data;
+    }
+    let impl = this._get_media_impls()[media_type];
+    if (impl === undefined)
+      return false;
+    let script_promises = [];
+    for (let j = 0; j < impl.scripts.length; j++) {
+      script_promises.push(new Promise((resolve, reject) => {
+        impl.scripts[j].loader(resolve);
+      }));
+    }
+    Promise.all(script_promises).then(() => {
+      impl.handler(result_id, media_type, media_data, result_container);
+    });
+    return true;
+  }
+
   static handle_all(items, result_id, result_container) {
     for (let i = 0; i < items.length; i++) {
-      let media = items[i];
-      let impl = this._get_media_impls()[media[0]];
-      if (impl === undefined)
-        continue;
-      let script_promises = [];
-      for (let j = 0; j < impl.scripts.length; j++) {
-        script_promises.push(new Promise((resolve, reject) => {
-          impl.scripts[j].loader(resolve);
-        }));
-      }
-      Promise.all(script_promises).then(() => {
-        impl.handler(result_id + '-' + i, media[0], media[1], result_container);
-      });
+      this.handle(items[i], result_id + '-' + i, result_container);
     }
   }
 
