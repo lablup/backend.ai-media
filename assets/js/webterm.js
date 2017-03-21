@@ -95,7 +95,9 @@ class Webterm {
       this.writable = new SocketWritable(this.sessId, this._sock);
       if (created) {
         this.term.on('data', (data) => {
-          this.writable.write(data);
+          if (this.writable !== null) {
+            this.writable.write(data);
+          }
         });
       }
 
@@ -159,9 +161,14 @@ class Webterm {
           reject('connection failure');
         }
         console.log('close (' + e.code + ', ' + e.reason + ')');
-        if (e.code == 3000) {
+        switch (e.code) {
+        case 1000:
           this.term.write('\r\n\x1b[37;44;1m Server terminated! \x1b[0m');
           this.term.write('\r\n\x1b[36mTo launch your terminal again, click "Run" button on the sidebar.\x1b[0m\r\n');
+          break;
+        default:
+          this.term.write('\r\n\x1b[37;41;1m Server refused to connect! \x1b[0;31m\r\nError: ' + e.reason + '\r\nPlease try again later.\x1b[0m\r\n');
+          break;
         }
         this._sock = null;
         this.writable = null;
