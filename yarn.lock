@@ -1633,6 +1633,10 @@ getpass@^0.1.1:
   dependencies:
     assert-plus "^1.0.0"
 
+gitgraph.js@^1.9.0:
+  version "1.9.0"
+  resolved "https://registry.yarnpkg.com/gitgraph.js/-/gitgraph.js-1.9.0.tgz#c2329f74123db2a3d8886c198906c2bb161b2fdf"
+
 glob-base@^0.3.0:
   version "0.3.0"
   resolved "https://registry.yarnpkg.com/glob-base/-/glob-base-0.3.0.tgz#dbb164f6221b1c0b1ccf82aea328b497df0ea3c4"

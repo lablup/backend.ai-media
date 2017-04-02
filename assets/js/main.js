@@ -26,6 +26,13 @@ var drawing_loader = (resolve) => {
   });
 };
 
+var gitgraph_loader = (resolve) => {
+  require.ensure(['gitgraph.js'], function() {
+    require('gitgraph.js');
+    resolve();
+  });
+};
+
 Sorna.loadWebterm = (resolve) => {
   if (Sorna.Webterm === undefined) {
     require.ensure(['./webterm.js'], function() {
@@ -118,10 +125,57 @@ class _Media {
     };
   }
 
+  static _get_gitgraph_impl() {
+    function _getTemplate() {
+      let templateConfig = {
+        colors: [ "#F00", "#0F0", "#00F" ],  // branches colors, 1 per column
+        branch: {
+          lineWidth: 6,
+          spacingX: 50,
+          showLabel: true,  // display branch names on graph
+        },
+        commit: {
+          spacingY: -30,
+          dot: {
+            size: 12
+          },
+          message: {
+            displayAuthor: false,
+            displayBranch: false,
+            displayHash: true,
+            font: "normal 10pt Arial"
+          },
+          shouldDisplayTooltipsInCompactMode: true,
+          tooltipHTMLFormatter: (commit) => {
+            return "" + commit.sha1 + "" + ": " + commit.message;
+          }
+        }
+      };
+      return new GitGraph.Template(templateConfig);
+    }
+
+    return {
+      scripts: [
+        {id: 'js.gitgraph', loader: gitgraph_loader}
+      ],
+      handler: (result_id, type, data, container) => {
+        const gitgraph = new GitGraph({ template: _getTemplate() });
+        const master = gitgraph.branch('master');
+
+        // Store all ref info for each commit for later branch commit.
+        data.forEach((commit) => {
+          // TODO: how to draw commit tree efficiently?
+          console.log(commit);
+        });
+      }
+    };
+  }
+
   static _get_media_impls() {
     let image_impl = this._get_image_impl();
     return {
       'application/x-sorna-drawing': this._get_drawing_impl(),
+      'application/vnd.sorna.gitgraph': this._get_gitgraph_impl(),
       'image/svg+xml': this._get_svg_impl(),
       'image/png': image_impl,
       'image/jpeg': image_impl,

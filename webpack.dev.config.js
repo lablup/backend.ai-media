@@ -1,5 +1,5 @@
 const webpack = require("webpack");
-const path = require('path')
+const path = require('path');
 
 const Dashboard = require('webpack-dashboard');
 const DashboardPlugin = require('webpack-dashboard/plugin');

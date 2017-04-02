@@ -11,6 +11,7 @@
     "babel-polyfill": "^6.22.0",
     "babel-preset-env": "^1.1.8",
     "css-loader": "^0.26.1",
+    "gitgraph.js": "^1.9.0",
     "msgpack-lite": ">=0.1.20",
     "sockjs-client": "^1.1.2",
     "style-loader": "^0.13.1",
