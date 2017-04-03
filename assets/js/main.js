@@ -126,47 +126,89 @@ class _Media {
   }
 
   static _get_gitgraph_impl() {
-    function _getTemplate() {
-      let templateConfig = {
-        colors: [ "#F00", "#0F0", "#00F" ],  // branches colors, 1 per column
-        branch: {
-          lineWidth: 6,
-          spacingX: 50,
-          showLabel: true,  // display branch names on graph
-        },
-        commit: {
-          spacingY: -30,
-          dot: {
-            size: 12
-          },
-          message: {
-            displayAuthor: false,
-            displayBranch: false,
-            displayHash: true,
-            font: "normal 10pt Arial"
-          },
-          shouldDisplayTooltipsInCompactMode: true,
-          tooltipHTMLFormatter: (commit) => {
-            return "" + commit.sha1 + "" + ": " + commit.message;
-          }
-        }
-      };
-      return new GitGraph.Template(templateConfig);
-    }
-
     return {
       scripts: [
         {id: 'js.gitgraph', loader: gitgraph_loader}
       ],
       handler: (result_id, type, data, container) => {
         const gitgraph = new GitGraph({ template: _getTemplate() });
-        const master = gitgraph.branch('master');
+        let branches = {};  // registered branches
 
-        // Store all ref info for each commit for later branch commit.
         data.forEach((commit) => {
-          // TODO: how to draw commit tree efficiently?
-          console.log(commit);
+          let currentBranch = _getOrCreateCurrentBranch(commit);
+          let commitInfo = {
+            sha1: commit.oid,
+            message: commit.message,
+            author: commit.author
+          };
+          if (commit.parent_ids.length < 2) {  // normal commit
+            currentBranch.commit(commitInfo);
+          } else {  // merge commit
+            const mergeeBranch = branches[commit.parent_branches[1]];
+            mergeeBranch.merge(currentBranch, commitInfo);
+          }
         });
+
+        function _getTemplate() {
+          let templateConfig = {
+            // colors: [ "#F00", "#0F0", "#00F" ],  // branches colors, 1 per column
+            branch: {
+              lineWidth: 5,
+              spacingX: 50,
+              showLabel: true,  // display branch names on graph
+            },
+            commit: {
+              spacingY: -30,
+              dot: {
+                size: 8
+              },
+              message: {
+                displayAuthor: false,
+                displayBranch: false,
+                displayHash: true,
+                font: "normal 10pt Arial"
+              },
+              shouldDisplayTooltipsInCompactMode: true,
+              tooltipHTMLFormatter: (commit) => {
+                return "" + commit.sha1 + "" + ": " + commit.message;
+              }
+            }
+          };
+          return new GitGraph.Template(templateConfig);
+        }
+
+        function _getOrCreateCurrentBranch(commit) {
+          let currentBranch;
+          let parentCommit;
+
+          if (branches.hasOwnProperty(commit.branch)) {
+            // Branch already exists.
+            currentBranch = branches[commit.branch];
+          } else {
+            // Create new branch from parent commit (not from branch).
+            const parentBranch = branches[commit.parent_branches[0]];
+            if (parentBranch) {
+              for (let i = 0; i < parentBranch.commits.length; i++) {
+                if (commit.parent_ids[0] === parentBranch.commits[i].sha1) {
+                  parentCommit = parentBranch.commits[i];
+                  break;
+                }
+              }
+            }
+            if (parentCommit) {
+              currentBranch = gitgraph.branch({
+                parentBranch: parentBranch,
+                parentCommit: parentCommit,
+                name: commit.branch
+              });
+            } else {  // for master branch
+              currentBranch = gitgraph.branch(commit.branch);
+            }
+            branches[commit.branch] = currentBranch;
+          }
+
+          return currentBranch;
+        }
       }
     };
   }
