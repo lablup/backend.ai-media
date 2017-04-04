@@ -250,11 +250,6 @@ class Webterm {
     }, 300);
   }
 
-  visualizeGitTree(data, container) {
-    const item = [data[0], data[1]];
-    Sorna.Media.handle(item, 'gittree', container);
-  }
-
 }
 
 export default Webterm;
