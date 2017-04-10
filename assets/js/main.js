@@ -131,7 +131,15 @@ class _Media {
         {id: 'js.gitgraph', loader: gitgraph_loader}
       ],
       handler: (result_id, type, data, container) => {
-        const gitgraph = new GitGraph({ template: _getTemplate() });
+        let id_lst = result_id.split('-');
+        id_lst.pop();  // remove trailing continue number
+        id_lst[0] = 'gitGraph';
+        result_id = id_lst.join('-');
+
+        const gitgraph = new GitGraph({
+          elementId: result_id,
+          template: _getTemplate()
+        });
         let branches = {};  // registered branches
 
         data.forEach((commit) => {
