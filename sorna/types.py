@@ -1,4 +1,4 @@
-from namedlist import namedtuple
+from namedlist import namedtuple, FACTORY
 
 
 InputRequest = namedtuple('InputRequest', [
@@ -7,6 +7,10 @@ InputRequest = namedtuple('InputRequest', [
 
 ControlRecord = namedtuple('ControlRecord', [
     ('event', None),
+])
+
+CompletionRecord = namedtuple('CompletionRecord', [
+    ('matches', FACTORY(list)),
 ])
 
 ConsoleRecord = namedtuple('ConsoleRecord', [
