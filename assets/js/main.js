@@ -137,7 +137,7 @@ class _Media {
         result_id = id_lst.join('-');
 
         const gitgraph = new GitGraph({
-          elementId: result_id,
+          canvas: container,
           template: _getTemplate()
         });
         let branches = {};  // registered branches
