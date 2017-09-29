@@ -1,5 +1,0 @@
-matplotlib>=1.5
-simplejson
-six
-namedlist
-u-msgpack-python
