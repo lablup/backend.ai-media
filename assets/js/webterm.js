@@ -178,6 +178,16 @@ class Webterm {
     });
   }
 
+  close() {
+    this._connecting = false;
+    this._connected = false;
+    this._sock.close(1000, 'User has moved away.');
+    this._sock = null;
+    this.writable = null;
+    window.clearInterval(this.pinger);
+    this.pinger = null;
+  }
+
   focus() {
     this.container.focus();
   }
