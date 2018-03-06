@@ -7,7 +7,7 @@ const config = {
     main: './assets/js/main.js',
   },
   output: {
-    path: path.resolve(__dirname, "./assets/[hash]/js"),
+    path: path.resolve(__dirname, "dist/[hash]/js"),
     publicPath: "/[hash]/js/",
     filename: "[name].min.js",
   },
@@ -24,16 +24,14 @@ const config = {
       },
       {
         test: /\.css$/,
-        include: /node_modules/,
-        loaders: ["style-loader", "css-loader"],
+        loaders: ['style-loader', 'css-loader'],
       },
     ],
   },
   resolve: {
-    //alias: {
-    //  'fabric': '../vendor/fabric/fabric.js',
-    //  'xterm': '../vendor/xterm/xterm.js',
-    //},
+    alias: {
+      'styles': path.resolve(__dirname, "assets/styles"),
+    },
     extensions: ['.json', '.js', '.ts', '.tsx', '.css'],
   },
   devtool: 'hidden-source-map',

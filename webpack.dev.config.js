@@ -26,16 +26,14 @@ const config = {
       },
       {
         test: /\.css$/,
-        include: /node_modules/,
         loaders: ["style-loader", "css-loader"],
       },
     ],
   },
   resolve: {
-    //alias: {
-    //  'fabric': '../vendor/fabric/fabric.js',
-    //  'xterm': '../vendor/xterm/xterm.js',
-    //},
+    alias: {
+      'styles': path.resolve(__dirname, "assets/styles"),
+    },
     extensions: ['.json', '.js', '.ts', '.tsx', '.css'],
   },
   devtool: 'inline-source-map',

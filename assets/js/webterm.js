@@ -2,8 +2,7 @@
 
 const Terminal = require('xterm').Terminal;
 const Writable = require('stream').Writable;
-
-require("xterm/dist/xterm.css");
+require("styles/xterm.custom.css");
 
 function b64EncodeUnicode(str) {
   return window.btoa(unescape(encodeURIComponent( str )));
@@ -45,7 +44,7 @@ class SocketWritable extends Writable {
 }
 
 class Webterm {
-  constructor(container, sessionId) {
+  constructor(container, sessionId, theme) {
     this.container = container;
     this.term = null;
     this.pinger = null;
@@ -55,6 +54,10 @@ class Webterm {
     this._connected = false;
     this.writable = null;
     this.restartLoadingTick = null;
+    this.theme = (theme !== undefined) ? theme : {
+      foreground: '#c5c1c1',
+      background: '#131416',
+    };
   }
 
   get connecting() {
@@ -79,7 +82,10 @@ class Webterm {
 
       let created = false;
       if (this.term === null) {
-        this.term = new Terminal();
+        this.term = new Terminal({
+          fontFamily: 'Input-Mono, Menlo, Consolas, Courier-New, Courier, monospace',
+          theme: this.theme,
+        });
         this.term.open(this.container);
         created = true;
       }
