@@ -13,11 +13,11 @@
     "base64-js": "^1.2.3",
     "css-loader": "^0.28.10",
     "fabric": "^2.1.0",
+    "fast-text-encoding": "^1.0.0",
     "gitgraph.js": "^1.11.4",
     "inspectpack": "^2.2.4",
     "msgpack-lite": ">=0.1.26",
     "style-loader": "^0.20.2",
-    "text-encoder-lite": "^1.0.1",
     "ts-loader": "^4.0.1",
     "typescript": "^2.7.2",
     "webpack": "^4.1.0",
@@ -31,7 +31,7 @@
     "xterm": "^3.1.0"
   },
   "scripts": {
-    "dev": "webpack-dev-server --config webpack.dev.config.js --optimize-minimize",
+    "devserver": "webpack-dev-server --config webpack.dev.config.js --optimize-minimize",
     "dashboard": "webpack-dashboard -- webpack-dev-server --config webpack.dev.config.js --optimize-minimize",
     "update": "./update.sh",
     "build": "webpack --optimize-minimize"

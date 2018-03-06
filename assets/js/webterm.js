@@ -1,13 +1,13 @@
 'use strict';
 
 import { Terminal } from 'xterm';
-import { TextEncoderLite, TextDecoderLite } from 'text-encoder-lite';
 import base64js from 'base64-js';
+require("fast-text-encoding");  // for side-effects
 require("xterm/src/xterm.css");
 require("styles/xterm.custom.css");
 
-const _tencoder = new (TextEncoder || TextEncoderLite)('utf-8');
-const _tdecoder = new (TextDecoder || TextDecoderLite)('utf-8');
+const _tencoder = new TextEncoder('utf-8');
+const _tdecoder = new TextDecoder('utf-8');
 
 function Base64Encode(str) {
     let bytes = _tencoder.encode(str);

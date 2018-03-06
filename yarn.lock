@@ -2472,6 +2472,10 @@ fast-levenshtein@~2.0.4:
   version "2.0.6"
   resolved "https://registry.yarnpkg.com/fast-levenshtein/-/fast-levenshtein-2.0.6.tgz#3d8a5c66883a16a30ca8643e851f19baa7797917"
 
+fast-text-encoding@^1.0.0:
+  version "1.0.0"
+  resolved "https://registry.yarnpkg.com/fast-text-encoding/-/fast-text-encoding-1.0.0.tgz#3e5ce8293409cfaa7177a71b9ca84e1b1e6f25ef"
+
 fastparse@^1.1.1:
   version "1.1.1"
   resolved "https://registry.yarnpkg.com/fastparse/-/fastparse-1.1.1.tgz#d1e2643b38a94d7583b479060e6c4affc94071f8"
@@ -6202,10 +6206,6 @@ temp@^0.8.1:
   dependencies:
     os-tmpdir "^1.0.0"
     rimraf "~2.2.6"
-
-text-encoder-lite@^1.0.1:
-  version "1.0.1"
-  resolved "https://registry.yarnpkg.com/text-encoder-lite/-/text-encoder-lite-1.0.1.tgz#121c5ee74dfeb307037770ec75748c6824ac0518"
 
 text-table@^0.2.0:
   version "0.2.0"
