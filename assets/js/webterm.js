@@ -1,51 +1,31 @@
 'use strict';
 
-const Terminal = require('xterm').Terminal;
-const Writable = require('stream').Writable;
+import { Terminal } from 'xterm';
+import { TextEncoderLite, TextDecoderLite } from 'text-encoder-lite';
+import base64js from 'base64-js';
 require("xterm/src/xterm.css");
 require("styles/xterm.custom.css");
 
-function b64EncodeUnicode(str) {
-  return window.btoa(unescape(encodeURIComponent( str )));
-  //return btoa(encodeURIComponent(str).replace(/%([0-9A-F]{2})/g, function(match, p1) {
-  //  return String.fromCharCode('0x' + p1);
-  //}));
+const _tencoder = new (TextEncoder || TextEncoderLite)('utf-8');
+const _tdecoder = new (TextDecoder || TextDecoderLite)('utf-8');
+
+function Base64Encode(str) {
+    let bytes = _tencoder.encode(str);
+    return base64js.fromByteArray(bytes);
 }
 
-function b64DecodeUnicode(str) {
-  try {
-    return decodeURIComponent(escape(window.atob( str )));
-    //return decodeURIComponent(Array.prototype.map.call(atob(str), function(c) {
-    //  return '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2);
-    //}).join(''));
-  } catch (e) {
-    // do nothing
-  }
+function Base64Decode(str, encoding = 'utf-8') {
+    let bytes = base64js.toByteArray(str);
+    return _tdecoder.decode(bytes);
 }
 
-
-class SocketWritable extends Writable {
-  constructor(sessId, sock) {
-    super();
-    this._sessId = sessId;
-    this._sock = sock;
-  }
-
-  write(chunk, encoding, cb) {
-    if (this._sock === null)
-      return;
-    let msg = JSON.stringify({
-      "sid": this._sessId,
-      "type": "stdin",
-      "chars": b64EncodeUnicode(chunk),
-    });
-    this._sock.send(msg);
-    if (cb) cb();
-  }
-}
+const defaultTheme = {
+  foreground: '#c5c1c1',
+  background: '#131416',
+};
 
 class Webterm {
-  constructor(container, sessionId, theme) {
+  constructor(container, sessionId, {theme=defaultTheme} = {}) {
     this.container = container;
     this.term = null;
     this.pinger = null;
@@ -53,12 +33,9 @@ class Webterm {
     this._sock = null;
     this._connecting = false;
     this._connected = false;
-    this.writable = null;
+    this.stdin = null;
     this.restartLoadingTick = null;
-    this.theme = (theme !== undefined) ? theme : {
-      foreground: '#c5c1c1',
-      background: '#131416',
-    };
+    this._theme = theme;
   }
 
   get connecting() {
@@ -85,7 +62,7 @@ class Webterm {
       if (this.term === null) {
         this.term = new Terminal({
           fontFamily: 'Input-Mono, Menlo, Consolas, Courier-New, Courier, monospace',
-          theme: this.theme,
+          theme: this._theme,
         });
         this.term.open(this.container);
         created = true;
@@ -96,12 +73,20 @@ class Webterm {
       this._sock = new WebSocket(url);
 
       // TODO: remove existing handlers
-      this.writable = new SocketWritable(this.sessId, this._sock);
+      this.stdin = (chunk) => {
+        if (this._sock === null)
+          return;
+        let msg = JSON.stringify({
+          "sid": this.sessId,
+          "type": "stdin",
+          "chars": Base64Encode(chunk),
+        });
+        this._sock.send(msg);
+      };
+
       if (created) {
-        this.term.on('data', (data) => {
-          if (this.writable !== null) {
-            this.writable.write(data);
-          }
+        this.term.on('data', (chunk) => {
+          this.stdin(chunk);
         });
       }
 
@@ -140,7 +125,7 @@ class Webterm {
         let data = JSON.parse(ev.data);
         switch (data.type) {
         case "out":
-          this.term.write(b64DecodeUnicode(data.data));
+          this.term.write(Base64Decode(data.data));
           break;
         case "error":
           this.term.write('\r\n\x1b[37;41;1m Ooops, we got a server error! \x1b[0;31m\r\n' + data.reason + '\x1b[0m\r\n');
@@ -175,7 +160,6 @@ class Webterm {
           break;
         }
         this._sock = null;
-        this.writable = null;
         window.clearInterval(this.pinger);
         this.pinger = null;
       };
@@ -187,7 +171,6 @@ class Webterm {
     this._connected = false;
     this._sock.close(1000, 'User has moved away.');
     this._sock = null;
-    this.writable = null;
     window.clearInterval(this.pinger);
     this.pinger = null;
   }
@@ -198,17 +181,13 @@ class Webterm {
 
   requestRedraw() {
     // Ctrl+L (redraw term)
-    if (this.writable != null)
-      this.writable.write('\x0c');
+    this.stdin('\x0c');
   }
 
-  resizeToFit(elem, opts) {
+  resizeToFit(elem, {maxRows=0, maxCols=0} = {}) {
     if (typeof elem == 'undefined') {
       elem = this.container;
     }
-    opts = opts || {};
-    opts.maxRows = ('maxRows' in opts) ? opts.maxRows : 0;
-    opts.maxCols = ('maxCols' in opts) ? opts.maxCols : 0;
     let targetWidth = elem.offsetWidth;
     let targetHeight = elem.offsetHeight;
     let tempText = document.createElement('div');
@@ -230,10 +209,10 @@ class Webterm {
     tempText.remove();
     let numRows = parseInt(targetHeight / charHeight) - 2;
     let numCols = parseInt(targetWidth / charWidth) - 2;
-    if (opts.maxRows > 0)
-      numRows = Math.min(numRows, opts.maxRows);
-    if (opts.maxCols > 0)
-      numCols = Math.min(numCols, opts.maxCols);
+    if (maxRows > 0)
+      numRows = Math.min(numRows, maxRows);
+    if (maxCols > 0)
+      numCols = Math.min(numCols, maxCols);
     this.term.resize(numCols, numRows);
     if (this._connected) {
       this._sock.send(JSON.stringify({
@@ -263,6 +242,15 @@ class Webterm {
       this.term.write('\x1b[32m' + tick + '\x1b[0m');
       this.requestRedraw();
     }, 300);
+  }
+
+  get theme() {
+    return this.term.getOption('theme');
+  }
+
+  set theme(value) {
+    this.term.setOption('theme', value);
+    this._theme = value;
   }
 
 }

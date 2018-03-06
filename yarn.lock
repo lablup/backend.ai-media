@@ -977,7 +977,7 @@ base64-arraybuffer@0.1.5:
   version "0.1.5"
   resolved "https://registry.yarnpkg.com/base64-arraybuffer/-/base64-arraybuffer-0.1.5.tgz#73926771923b5a19747ad666aa5cd4bf9c6e9ce8"
 
-base64-js@^1.0.2:
+base64-js@^1.0.2, base64-js@^1.2.3:
   version "1.2.3"
   resolved "https://registry.yarnpkg.com/base64-js/-/base64-js-1.2.3.tgz#fb13668233d9614cf5fb4bce95a9ba4096cdf801"
 
@@ -6202,6 +6202,10 @@ temp@^0.8.1:
   dependencies:
     os-tmpdir "^1.0.0"
     rimraf "~2.2.6"
+
+text-encoder-lite@^1.0.1:
+  version "1.0.1"
+  resolved "https://registry.yarnpkg.com/text-encoder-lite/-/text-encoder-lite-1.0.1.tgz#121c5ee74dfeb307037770ec75748c6824ac0518"
 
 text-table@^0.2.0:
   version "0.2.0"
