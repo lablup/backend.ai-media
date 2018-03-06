@@ -1,7 +1,8 @@
 'use strict';
 
 const Terminal = require('xterm');
-const SockJS = require('sockjs-client');
+//const SockJS = require('sockjs-client');
+const SockJS = null;
 const Writable = require('stream').Writable;
 
 require("!!style-loader!css-loader!../vendor/xterm/xterm.css");
