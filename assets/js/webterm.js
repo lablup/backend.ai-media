@@ -58,21 +58,19 @@ class Webterm {
         return;
       }
 
-      let created = false;
       if (this.term === null) {
         this.term = new Terminal({
           fontFamily: 'Input-Mono, Menlo, Consolas, Courier-New, Courier, monospace',
           theme: this._theme,
         });
         this.term.open(this.container);
-        created = true;
+      } else {
+        this.term.off('data', this.stdin);
       }
       this.term.reset();
       this.term.write("Loading your terminal...\r\n");
 
       this._sock = new WebSocket(url);
-
-      // TODO: remove existing handlers
       this.stdin = (chunk) => {
         if (this._sock === null)
           return;
@@ -83,12 +81,10 @@ class Webterm {
         });
         this._sock.send(msg);
       };
-
-      if (created) {
-        this.term.on('data', (chunk) => {
-          this.stdin(chunk);
-        });
-      }
+      this.term.on('data', (chunk) => {
+        this.stdin(chunk);
+        return false;
+      });
 
       let is_settled = false;
 
@@ -128,7 +124,8 @@ class Webterm {
           this.term.write(Base64Decode(data.data));
           break;
         case "error":
-          this.term.write('\r\n\x1b[37;41;1m Ooops, we got a server error! \x1b[0;31m\r\n' + data.reason + '\x1b[0m\r\n');
+          this.term.write('\r\n\x1b[37;41;1m Ooops, we got a server error! \x1b[0m');
+          this.term.write(`\r\n\x1b[91m${data.reason}\x1b[0m\r\n`);
           break;
         }
       };
@@ -149,15 +146,16 @@ class Webterm {
           is_settled = true;
           reject('connection failure');
         }
-        console.log('close (' + ev.code + ', ' + ev.reason + ')');
-        switch (ev.code) {
-        case 1000:
+        console.log(`close (${ev.code}, ${ev.reason})`);
+        if (ev.code >= 1000 && ev.code < 2000) {
           this.term.write('\r\n\x1b[37;44;1m Server terminated! \x1b[0m');
-          this.term.write('\r\n\x1b[36mTo launch your terminal again, click "Run" button on the sidebar.\x1b[0m\r\n');
-          break;
-        default:
-          this.term.write('\r\n\x1b[37;41;1m Server refused to connect! \x1b[0;31m\r\nError: ' + ev.reason + '\r\nPlease try again later.\x1b[0m\r\n');
-          break;
+          this.term.write('\r\n\x1b[94mTo launch your terminal again, click "Run" button on the sidebar.\x1b[0m\r\n');
+        } else if (ev.code >= 4000 && ev.code < 5000) {
+          this.term.write('\r\n\x1b[37;41;1m Server error! \x1b[0m');
+          this.term.write(`\r\n\x1b[91mError: ${ev.reason}\r\nPlease try again later.\x1b[0m\r\n`);
+        } else {
+          this.term.write('\r\n\x1b[37;41;1m Server refused to connect! \x1b[0m');
+          this.term.write(`\r\n\x1b[91mError: ${ev.reason}\r\nPlease try again later.\x1b[0m\r\n`);
         }
         this._sock = null;
         window.clearInterval(this.pinger);
