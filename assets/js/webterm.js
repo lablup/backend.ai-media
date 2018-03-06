@@ -1,11 +1,9 @@
 'use strict';
 
-const Terminal = require('xterm');
-//const SockJS = require('sockjs-client');
-const SockJS = null;
+const Terminal = require('xterm').Terminal;
 const Writable = require('stream').Writable;
 
-require("!!style-loader!css-loader!../vendor/xterm/xterm.css");
+require("xterm/dist/xterm.css");
 
 function b64EncodeUnicode(str) {
   return window.btoa(unescape(encodeURIComponent( str )));
@@ -67,7 +65,7 @@ class Webterm {
     return this._connected;
   }
 
-  connect() {
+  connect(url) {
     return new Promise((resolve, reject) => {
 
       if (this._connecting) {
@@ -88,9 +86,7 @@ class Webterm {
       this.term.reset();
       this.term.write("Loading your terminal...\r\n");
 
-      let url = "//" + document.domain
-                + (location.port ? (":" + location.port) : "")  + "/ws?lang=git";
-      this._sock = new SockJS(url);
+      this._sock = new WebSocket(url);
 
       // TODO: remove existing handlers
       this.writable = new SocketWritable(this.sessId, this._sock);
@@ -104,7 +100,7 @@ class Webterm {
 
       let is_settled = false;
 
-      this._sock.onopen = () => {
+      this._sock.onopen = (ev) => {
         this.pinger = window.setInterval(() => {
           if (this._connected) {
             this._sock.send(JSON.stringify({
@@ -119,7 +115,7 @@ class Webterm {
         }, 300);
       };
 
-      this._sock.onmessage = (e) => {
+      this._sock.onmessage = (ev) => {
         if (!is_settled) {
           window.clearInterval(this.initialKeystroke);
           is_settled = true;
@@ -134,7 +130,7 @@ class Webterm {
           window.clearInterval(this.restartLoadingTick);
           this.restartLoadingTick = null;
         }
-        let data = JSON.parse(e.data);
+        let data = JSON.parse(ev.data);
         switch (data.type) {
         case "out":
           this.term.write(b64DecodeUnicode(data.data));
@@ -145,7 +141,7 @@ class Webterm {
         }
       };
 
-      this._sock.onerror = (e) => {
+      this._sock.onerror = (ev) => {
         if (!is_settled) {
           is_settled = true;
           this._connecting = false;
@@ -154,21 +150,21 @@ class Webterm {
         this._connected = false;
       };
 
-      this._sock.onclose = (e) => {
+      this._sock.onclose = (ev) => {
         this._connecting = false;
         this._connected = false;
         if (!is_settled) {
           is_settled = true;
           reject('connection failure');
         }
-        console.log('close (' + e.code + ', ' + e.reason + ')');
-        switch (e.code) {
+        console.log('close (' + ev.code + ', ' + ev.reason + ')');
+        switch (ev.code) {
         case 1000:
           this.term.write('\r\n\x1b[37;44;1m Server terminated! \x1b[0m');
           this.term.write('\r\n\x1b[36mTo launch your terminal again, click "Run" button on the sidebar.\x1b[0m\r\n');
           break;
         default:
-          this.term.write('\r\n\x1b[37;41;1m Server refused to connect! \x1b[0;31m\r\nError: ' + e.reason + '\r\nPlease try again later.\x1b[0m\r\n');
+          this.term.write('\r\n\x1b[37;41;1m Server refused to connect! \x1b[0;31m\r\nError: ' + ev.reason + '\r\nPlease try again later.\x1b[0m\r\n');
           break;
         }
         this._sock = null;
@@ -195,7 +191,8 @@ class Webterm {
 
   requestRedraw() {
     // Ctrl+L (redraw term)
-    this.writable.write('\x0c');
+    if (this.writable != null)
+      this.writable.write('\x0c');
   }
 
   resizeToFit(elem, opts) {

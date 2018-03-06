@@ -1,14 +1,14 @@
 'use strict';
 
-/** Sorna Media Handlers. */
+/** Backend.AI Media Handlers. */
 
-window.Sorna = window.Sorna || { version: '0.9.0' };
-if (Sorna.assetRoot === undefined) {
+window.BackendAI = window.BackendAI || { version: '0.9.0' };
+if (BackendAI.assetRoot === undefined) {
   // Fallback to the current host address
-  Sorna.assetRoot = window.location.protocol + '//' + window.location.host;
+  BackendAI.assetRoot = window.location.protocol + '//' + window.location.host;
 }
-__webpack_public_path__ = Sorna.assetRoot;
-__webpack_require__.p = Sorna.assetRoot + '/js/';
+__webpack_public_path__ = BackendAI.assetRoot;
+__webpack_require__.p = BackendAI.assetRoot + '/js/';
 
 require('babel-polyfill');
 
@@ -21,7 +21,7 @@ var fabric_loader = (resolve) => {
 
 var drawing_loader = (resolve) => {
   require.ensure(['./drawing.js'], function() {
-    Sorna.Drawing = require('./drawing.js').default;
+    BackendAI.Drawing = require('./drawing.js').default;
     resolve();
   });
 };
@@ -33,10 +33,10 @@ var gitgraph_loader = (resolve) => {
   });
 };
 
-Sorna.loadWebterm = (resolve) => {
-  if (Sorna.Webterm === undefined) {
+BackendAI.loadWebterm = (resolve) => {
+  if (BackendAI.Webterm === undefined) {
     require.ensure(['./webterm.js'], function() {
-      Sorna.Webterm = require('./webterm.js').default;
+      BackendAI.Webterm = require('./webterm.js').default;
       resolve();
     });
   } else
@@ -73,7 +73,7 @@ class _Media {
         {id:'js.sorna-drawing', loader:drawing_loader}
       ],
       handler: (result_id, type, data, container) => {
-        let drawing = new Sorna.Drawing(result_id, container);
+        let drawing = new BackendAI.Drawing(result_id, container);
         drawing.update(data);
       }
     };
@@ -268,8 +268,8 @@ class _Media {
   }
 }
 
-Sorna.Utils = _Utils;
-Sorna.Media = _Media;
+BackendAI.Utils = _Utils;
+BackendAI.Media = _Media;
 
 
 /// vim: sts=2 sw=2 et

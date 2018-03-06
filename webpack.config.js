@@ -2,6 +2,7 @@ const webpack = require("webpack");
 const path = require('path');
 
 const config = {
+  mode: 'production',
   entry: {
     main: './assets/js/main.js',
   },
@@ -23,25 +24,20 @@ const config = {
       },
       {
         test: /\.css$/,
-        use: [
-          { loader: "css-loader" },
-        ]
+        include: /node_modules/,
+        loaders: ["style-loader", "css-loader"],
       },
     ],
   },
   resolve: {
-    alias: {
-      'fabric': '../vendor/fabric/fabric.js',
-      'xterm': '../vendor/xterm/xterm.js',
-    },
+    //alias: {
+    //  'fabric': '../vendor/fabric/fabric.js',
+    //  'xterm': '../vendor/xterm/xterm.js',
+    //},
     extensions: ['.json', '.js', '.ts', '.tsx', '.css'],
   },
   devtool: 'hidden-source-map',
   plugins: [
-    new webpack.optimize.UglifyJsPlugin({
-      compress: { warnings: false },
-      sourceMap: true,
-    }),
   ]
 };
 

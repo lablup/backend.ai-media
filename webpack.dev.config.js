@@ -1,11 +1,10 @@
-const webpack = require("webpack");
+const webpack = require('webpack');
 const path = require('path');
 
-const Dashboard = require('webpack-dashboard');
 const DashboardPlugin = require('webpack-dashboard/plugin');
-let dashboard = new Dashboard();
 
 const config = {
+  mode: 'development',
   entry: {
     main: './assets/js/main.js',
   },
@@ -27,17 +26,16 @@ const config = {
       },
       {
         test: /\.css$/,
-        use: [
-          { loader: "css-loader" },
-        ]
+        include: /node_modules/,
+        loaders: ["style-loader", "css-loader"],
       },
     ],
   },
   resolve: {
-    alias: {
-      'fabric': '../vendor/fabric/fabric.js',
-      'xterm': '../vendor/xterm/xterm.js',
-    },
+    //alias: {
+    //  'fabric': '../vendor/fabric/fabric.js',
+    //  'xterm': '../vendor/xterm/xterm.js',
+    //},
     extensions: ['.json', '.js', '.ts', '.tsx', '.css'],
   },
   devtool: 'inline-source-map',
@@ -52,11 +50,7 @@ const config = {
     quiet: true,
   },
   plugins: [
-    new webpack.optimize.UglifyJsPlugin({
-      compress: { warnings: false },
-      sourceMap: true,
-    }),
-    new DashboardPlugin(dashboard.setData),
+    new DashboardPlugin({ port: 8002 }),
   ]
 };
 

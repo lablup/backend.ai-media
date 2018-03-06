@@ -1,6 +1,6 @@
 'use strict';
 
-/* Sorna Simplified Drawing API for HTML5 Canvas. */
+/* Backend.AI Simplified Drawing API for HTML5 Canvas. */
 
 import msgpack from 'msgpack-lite';
 

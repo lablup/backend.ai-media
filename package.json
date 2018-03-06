@@ -1,8 +1,8 @@
 {
-  "name": "sorna-media",
-  "version": "0.9.0",
+  "name": "backendai-media",
+  "version": "0.10.0",
   "main": "assets/js/main.js",
-  "repository": "git@github.com:lablup/sorna-media.git",
+  "repository": "git@github.com:lablup/backendai-media.git",
   "author": "Joongi Kim <joongi@lablup.com>",
   "license": "BSD-3-Clause",
   "devDependencies": {
@@ -11,7 +11,9 @@
     "babel-polyfill": "^6.26.0",
     "babel-preset-env": "^1.6.1",
     "css-loader": "^0.28.10",
+    "fabric": "^2.1.0",
     "gitgraph.js": "^1.11.4",
+    "inspectpack": "^2.2.4",
     "msgpack-lite": ">=0.1.26",
     "style-loader": "^0.20.2",
     "ts-loader": "^4.0.1",
@@ -19,14 +21,17 @@
     "webpack": "^4.1.0",
     "webpack-cli": "^2.0.10",
     "webpack-dashboard": "^1.1.1",
-    "webpack-dev-server": "^3.1.0"
+    "webpack-dev-server": "^3.1.0",
+    "xterm": "^3.1.0"
   },
   "dependencies": {
-    "fabric": "^2.1.0"
+    "fabric": "^2.1.0",
+    "xterm": "^3.1.0"
   },
   "scripts": {
-    "devserver": "webpack-dev-server --config webpack.dev.config.js",
+    "dev": "webpack-dev-server --config webpack.dev.config.js --optimize-minimize",
+    "dashboard": "webpack-dashboard -- webpack-dev-server --config webpack.dev.config.js --optimize-minimize",
     "update": "./update.sh",
-    "build": "webpack"
+    "build": "webpack --optimize-minimize"
   }
 }
