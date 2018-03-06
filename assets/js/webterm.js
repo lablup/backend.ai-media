@@ -2,6 +2,7 @@
 
 const Terminal = require('xterm').Terminal;
 const Writable = require('stream').Writable;
+require("xterm/src/xterm.css");
 require("styles/xterm.custom.css");
 
 function b64EncodeUnicode(str) {
