@@ -136,12 +136,14 @@ class Webterm {
           this._connecting = false;
           reject('connection failure');
         }
+        this.term.off('data', this.stdin);
         this._connected = false;
       };
 
       this._sock.onclose = (ev) => {
         this._connecting = false;
         this._connected = false;
+        this.term.off('data', this.stdin);
         if (!is_settled) {
           is_settled = true;
           reject('connection failure');
@@ -180,6 +182,7 @@ class Webterm {
   requestRedraw() {
     // Ctrl+L (redraw term)
     this.stdin('\x0c');
+    this.term.refresh(0, this.term.rows - 1, true);
   }
 
   resizeToFit(elem, {maxRows=0, maxCols=0} = {}) {
