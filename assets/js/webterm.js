@@ -38,6 +38,7 @@ class Webterm {
     this._connected = false;
     this.stdin = null;
     this.restartLoadingTick = null;
+    this._sock = null;
     this._theme = theme;
   }
 
@@ -67,27 +68,24 @@ class Webterm {
           theme: this._theme,
         });
         this.term.open(this.container);
-      } else {
-        this.term.off('data', this.stdin);
+        this.stdin = (chunk) => {
+          if (this._sock === null)
+            return;
+          let msg = JSON.stringify({
+            "sid": this.sessId,
+            "type": "stdin",
+            "chars": Base64Encode(chunk),
+          });
+          this._sock.send(msg);
+        };
+        this.term.on('data', (chunk) => {
+          this.stdin(chunk);
+          return false;
+        });
       }
       this.term.reset();
       this.term.write("Loading your terminal...\r\n");
-
       this._sock = new WebSocket(url);
-      this.stdin = (chunk) => {
-        if (this._sock === null)
-          return;
-        let msg = JSON.stringify({
-          "sid": this.sessId,
-          "type": "stdin",
-          "chars": Base64Encode(chunk),
-        });
-        this._sock.send(msg);
-      };
-      this.term.on('data', (chunk) => {
-        this.stdin(chunk);
-        return false;
-      });
 
       let is_settled = false;
 
@@ -139,14 +137,15 @@ class Webterm {
           this._connecting = false;
           reject('connection failure');
         }
-        this.term.off('data', this.stdin);
         this._connected = false;
+        this._sock = null;
       };
 
       this._sock.onclose = (ev) => {
+        window.clearInterval(this.pinger);
+        this.pinger = null;
         this._connecting = false;
         this._connected = false;
-        this.term.off('data', this.stdin);
         if (!is_settled) {
           is_settled = true;
           reject('connection failure');
@@ -163,19 +162,13 @@ class Webterm {
           this.term.write(`\r\n\x1b[91mError: ${ev.reason}\r\nPlease try again later.\x1b[0m\r\n`);
         }
         this._sock = null;
-        window.clearInterval(this.pinger);
-        this.pinger = null;
+        // we don't destroy the terminal object to show error logs to user.
       };
     });
   }
 
   close() {
-    this._connecting = false;
-    this._connected = false;
     this._sock.close(1000, 'User has moved away.');
-    this._sock = null;
-    window.clearInterval(this.pinger);
-    this.pinger = null;
   }
 
   focus() {
