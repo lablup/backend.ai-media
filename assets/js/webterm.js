@@ -1,10 +1,13 @@
 'use strict';
 
 import { Terminal } from 'xterm';
+import * as fit from 'xterm/lib/addons/fit/fit';
 import base64js from 'base64-js';
 require("fast-text-encoding");  // for side-effects
 require("xterm/src/xterm.css");
 require("styles/xterm.custom.css");
+
+Terminal.applyAddon(fit);  // Apply the `fit` addon
 
 const _tencoder = new TextEncoder('utf-8');
 const _tdecoder = new TextDecoder('utf-8');
@@ -176,7 +179,7 @@ class Webterm {
   }
 
   focus() {
-    this.container.focus();
+    this.term.focus();
   }
 
   requestRedraw() {
@@ -185,42 +188,14 @@ class Webterm {
     this.term.refresh(0, this.term.rows - 1, true);
   }
 
-  resizeToFit(elem, {maxRows=0, maxCols=0} = {}) {
-    if (typeof elem == 'undefined') {
-      elem = this.container;
-    }
-    let targetWidth = elem.offsetWidth;
-    let targetHeight = elem.offsetHeight;
-    let tempText = document.createElement('div');
-    let computedStyle = window.getComputedStyle(this.container);
-    tempText.style.fontFamily = computedStyle.fontFamily;
-    tempText.style.fontSize = computedStyle.fontSize;
-    tempText.style.fontStyle = computedStyle.fontStyle;
-    tempText.style.fontStretch = computedStyle.fontStretch;
-    tempText.style.lineHeight = computedStyle.lineHeight;
-    tempText.style.position = 'absolute';
-    tempText.style.visibility = 'hidden';
-    tempText.style.whiteSpace = 'nowrap';
-    tempText.style.padding = '0';
-    tempText.style.margin = '0';
-    tempText.innerText = 'A';
-    document.body.appendChild(tempText);
-    let charWidth = tempText.offsetWidth;
-    let charHeight = tempText.offsetHeight;
-    tempText.remove();
-    let numRows = parseInt(targetHeight / charHeight) - 2;
-    let numCols = parseInt(targetWidth / charWidth) - 2;
-    if (maxRows > 0)
-      numRows = Math.min(numRows, maxRows);
-    if (maxCols > 0)
-      numCols = Math.min(numCols, maxCols);
-    this.term.resize(numCols, numRows);
+  resizeToFit(elem) {
+    this.term.fit();
     if (this._connected) {
       this._sock.send(JSON.stringify({
         "sid": this.sessId,
         "type": "resize",
-        "rows": numRows,
-        "cols": numCols
+        "rows": this.term.rows,
+        "cols": this.term.cols
       }));
     }
   }
