@@ -585,7 +585,7 @@ class Drawing {
         canvas.renderAll();
       }
       this._playing = true;
-      Sorna.Utils.async_series(anim_chain, (anim_group) => {
+      BackendAI.Utils.async_series(anim_chain, (anim_group) => {
         // Our own animation loop because grouped animation causes
         // severe frame drops due to overlapping of multiple
         // animation loops with "canvas.renderAll()".
