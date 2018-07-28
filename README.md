@@ -119,11 +119,11 @@ To debug the webpack build process, simply run `webpack` and see what it says.
 
 Then, run the following to upload all assets:
 ```sh
-$ aws s3 cp assets s3://sorna-assets/ --recursive
+$ aws s3 cp assets s3://backendai-assets/ --recursive
 ```
 
 Afterwards, you must update the production configuration (e.g.,
 `BACKENDAI_ASSET_ROOT` in Django/Flask settings) for your front-end using the
 latest hash value.
-(e.g., https://s3.ap-northeast-2.amazonaws.com/sorna-assets/1234567890abcdef1234 )
+(e.g., https://s3.ap-northeast-2.amazonaws.com/backendai-assets/1234567890abcdef1234 )
 
