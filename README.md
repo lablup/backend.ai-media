@@ -18,7 +18,7 @@ It means that it's your job to connect with the Backend.AI on the cloud or
 on-premise servers, and you should have your own scripts to retrieve Backend.AI
 computation results in your own front-end.
 
-Your front-end should call `Sorna.Media.handle_all(<media-output-array>,
+Your front-end should call `BackendAI.Media.handle_all(<media-output-array>,
 <result-identifier>, <result-ctonainer>)` where `result-identifier`
 should be a unique string for each code block and `result-container` should
 be a reference to HTML element such as `<div>` blocks used for rendering the
@@ -48,7 +48,7 @@ $ yarn run build
 
 ### Integration with a front-end
 
-You need to specify `Sorna.assetRoot` in Javascript to let our scripts know
+You need to specify `BackendAI.assetRoot` in Javascript to let our scripts know
 which location to fetch additoinal scripts from.
 The `main.min.js` is designed to be small for faster page loads and most
 functionality (e.g., drawing support) are loaded on demand.
@@ -56,30 +56,30 @@ functionality (e.g., drawing support) are loaded on demand.
 For production:
 ```html
 <script>
-window.Sorna = window.Sorna || {};
-window.Sorna.assetRoot = '//<sorna-serving-host>/<hash>';
+window.BackendAI = window.BackendAI || {};
+window.BackendAI.assetRoot = '//<backendai-frontend-serving-host>/<hash>';
 </script>
-<script src="//<sorna-serving-host>/<hash>/js/main.min.js"></script>
+<script src="//<backendai-frontend-serving-host>/<hash>/js/main.min.js"></script>
 ```
-`<sorna-serving-host>` would be placed by a template variable from application
+`<backendai-frontend-serving-host>` would be placed by a template variable from application
 server settings.
 
 For development:
 ```html
 <script>
-window.Sorna = window.Sorna || {};
-window.Sorna.assetRoot = 'http://localhost:8002/latest';
+window.BackendAI = window.BackendAI || {};
+window.BackendAI.assetRoot = 'http://localhost:8002/latest';
 </script>
 <script src="http://localhost:8002/latest/js/main.min.js"></script>
 ```
 
-When receiving Sorna execution results:
+When receiving Backend.AI execution results:
 ```javascript
 var response = ...;
 var result_id = ...;
 var result_container = document.getElementById(...);
 // media is a list of (type, data) tuples produced by server-side Pyhon packages
-Sorna.Media.handle_all(response.media, result_id, result_container);
+BackendAI.Media.handle_all(response.media, result_id, result_container);
 ```
 
 
@@ -123,7 +123,7 @@ $ aws s3 cp assets s3://sorna-assets/ --recursive
 ```
 
 Afterwards, you must update the production configuration (e.g.,
-`SORNA_ASSET_ROOT` in Django/Flask settings) for your front-end using the
+`BACKENDAI_ASSET_ROOT` in Django/Flask settings) for your front-end using the
 latest hash value.
 (e.g., https://s3.ap-northeast-2.amazonaws.com/sorna-assets/1234567890abcdef1234 )
 
