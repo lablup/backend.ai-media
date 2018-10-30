@@ -61,6 +61,7 @@ class Webterm {
         reject('already connected');
         return;
       }
+      this._connecting = true;
 
       if (this.term === null) {
         this.term = new Terminal({
